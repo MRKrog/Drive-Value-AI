@@ -1,6 +1,6 @@
 # Drive Value AI - AI-Powered Vehicle Valuation Platform
 
-![Drive Value AI](drive-value-ai.jpg)
+<!-- ![Drive Value AI](drive-value-ai.jpg) -->
 
 A comprehensive vehicle valuation platform that uses **Claude AI** to provide real-time, data-driven market analysis for cars. Built with **React**, **Material-UI**, and modern web technologies to deliver professional-grade vehicle intelligence to consumers, dealers, and auction professionals.
 
@@ -213,6 +213,9 @@ const theme = createTheme({
 
 ## 🚀 **Quick Start**
 
+### **Live Demo**
+🌐 **Try Drive Value AI Now:** [https://magnificent-blini-83cb75.netlify.app/src/sidepanel.html](https://magnificent-blini-83cb75.netlify.app/src/sidepanel.html)
+
 ### **Prerequisites**
 - Node.js (v18 or higher)
 - npm or yarn
@@ -223,7 +226,7 @@ const theme = createTheme({
 1. **Clone the repository:**
    ```bash
    git clone <your-repo>
-   cd vinvaluation-pro
+   cd drive-value-ai
    npm install
    ```
 

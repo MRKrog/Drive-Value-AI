@@ -1,7 +1,7 @@
 {
-  "name": "phantom-wallet",
+  "name": "drive-value-ai",
   "version": "1.0.0",
-  "description": "A Chrome extension development template with Vite, React, and Material-UI components",
+  "description": "A Chrome extension for Drive Value AI",
   "type": "module",
   "scripts": {
     "dev": "vite",

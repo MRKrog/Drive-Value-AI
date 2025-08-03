@@ -15,14 +15,14 @@ function CryptoWalletApp() {
 
   const renderPage = () => {
     switch (currentPage) {
+      case 'search':
+        return <SearchPage />
       case 'home':
         return <HomePage />
       case 'swap':
         return <SwapPage />
       case 'history':
         return <HistoryPage />
-      case 'search':
-        return <SearchPage />
       default:
         return <HomePage />
     }

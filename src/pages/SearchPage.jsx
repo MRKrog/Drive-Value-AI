@@ -8,19 +8,30 @@ import {
   TextField,
   Button,
   Grid,
-  Chip,
-  Divider,
   Alert,
-  CircularProgress
+  CircularProgress,
+  Switch,
+  FormControlLabel,
+  ButtonGroup
 } from '@mui/material'
-import { Search, DirectionsCar, Build, Person } from '@mui/icons-material'
+import { Search } from '@mui/icons-material'
 import Header from '../components/Header'
+import { VehicleInfoDrawer } from '../components/VehicleInfoDrawer'
 
 const SearchPage = () => {
   const [vin, setVin] = useState('')
   const [isSearching, setIsSearching] = useState(false)
   const [searchResults, setSearchResults] = useState(null)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [error, setError] = useState('')
+  const [isTestMode, setIsTestMode] = useState(false)
+
+  // Test VINs for quick selection
+  const testVins = [
+    { name: 'Chevrolet Malibu', vin: '1G1ZD5ST8JF134138' },
+    { name: 'Honda Civic', vin: '1HGBH41JXMN109186' },
+    { name: 'Ford F-150', vin: '1FTFW1ET5DFC10312' }
+  ]
 
   const handleSearch = async () => {
     if (!vin.trim()) {
@@ -37,28 +48,62 @@ const SearchPage = () => {
     setError('')
     setSearchResults(null)
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSearching(false)
-      // Mock results - in real app, this would be API call
-      setSearchResults({
-        vin: vin.toUpperCase(),
-        make: 'Toyota',
-        model: 'Camry',
-        year: '2023',
-        trim: 'SE',
-        engine: '2.5L 4-Cylinder',
-        transmission: '8-Speed Automatic',
-        drivetrain: 'Front-Wheel Drive',
-        fuelType: 'Gasoline',
-        bodyStyle: 'Sedan',
-        doors: '4',
-        seats: '5',
-        mileage: '15,234',
-        color: 'Pearl White',
-        features: ['Bluetooth', 'Backup Camera', 'Lane Departure Warning', 'Adaptive Cruise Control']
+    try {
+      const apiEndpoint = isTestMode 
+        ? 'https://autovalidation-backend-production.up.railway.app/api/test-valuation'
+        : 'https://autovalidation-backend-production.up.railway.app/api/valuation'
+      
+      const response = await fetch(apiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ vin: vin.toUpperCase() })
       })
-    }, 2000)
+
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`)
+      }
+
+      const data = await response.json()
+      
+      if (data.analysis) {
+        // Parse the analysis data and extract vehicle information
+        const analysis = data.analysis
+        const results = {
+          vin: vin.toUpperCase(),
+          analysis: analysis,
+          vehicle: data.vehicle, // Include the vehicle object
+          report_id: data.report_id,
+          timestamp: data.timestamp,
+          generated_by: data.generated_by,
+          // Extract basic vehicle info from vehicle object
+          make: data.vehicle?.make || 'Unknown',
+          model: data.vehicle?.model || 'Unknown',
+          year: data.vehicle?.year || 'Unknown',
+          trim: data.vehicle?.trim || 'Unknown',
+          engine: data.vehicle?.engine || 'Unknown',
+          transmission: data.vehicle?.transmission || 'Unknown',
+          drivetrain: data.vehicle?.drivetrain || 'Unknown',
+          fuelType: data.vehicle?.fuelType || 'Unknown',
+          bodyStyle: data.vehicle?.bodyStyle || 'Unknown',
+          doors: data.vehicle?.doors || 'Unknown',
+          seats: data.vehicle?.seats || 'Unknown',
+          mileage: data.vehicle?.mileage || 'Unknown',
+          color: data.vehicle?.color || 'Unknown',
+          features: data.vehicle?.features || []
+        }
+        setSearchResults(results)
+        setIsDrawerOpen(true) // Open drawer when results are received
+      } else {
+        throw new Error('No analysis data received from API')
+      }
+    } catch (error) {
+      console.error('API Error:', error)
+      setError(`Failed to get vehicle information: ${error.message}`)
+    } finally {
+      setIsSearching(false)
+    }
   }
 
   const handleKeyPress = (event) => {
@@ -67,12 +112,90 @@ const SearchPage = () => {
     }
   }
 
+  const handleTestVinSelect = (selectedVin) => {
+    setVin(selectedVin)
+  }
+
+  const handleClear = () => {
+    setVin('')
+    setSearchResults(null)
+    setIsDrawerOpen(false)
+    setError('')
+  }
+
+  const handleOpenDrawer = () => {
+    if (searchResults) {
+      setIsDrawerOpen(true)
+    }
+  }
+
+  const handleCloseDrawer = () => {
+    setIsDrawerOpen(false)
+  }
+
   return (
     <Box sx={{ pb: 7, height: '100vh', overflow: 'auto' }}>
       <Header />
       <Container maxWidth="sm" sx={{ py: 3 }}>
-        <Typography variant="h5" sx={{ mb: 3, color: '#FFFFFF' }}>
-          Vehicle Search
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Typography variant="h5" sx={{ color: '#FFFFFF' }}>
+            Vehicle Search
+          </Typography>
+          
+          {/* Controls */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {/* API Mode Toggle */}
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={isTestMode}
+                  onChange={(e) => setIsTestMode(e.target.checked)}
+                  sx={{
+                    '& .MuiSwitch-switchBase.Mui-checked': {
+                      color: 'rgb(171, 159, 242)',
+                    },
+                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                      backgroundColor: 'rgb(171, 159, 242)',
+                    },
+                  }}
+                />
+              }
+              label={
+                <Typography sx={{ color: '#FFFFFF', fontSize: '0.875rem' }}>
+                  {isTestMode ? 'Test Mode' : 'Live Mode'}
+                </Typography>
+              }
+            />
+            
+            {/* Clear Button */}
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handleClear}
+              disabled={isSearching}
+              sx={{
+                color: '#A0A0A0',
+                borderColor: '#2A2A2A',
+                fontSize: '0.75rem',
+                px: 2,
+                '&:hover': {
+                  borderColor: '#A0A0A0',
+                  color: '#FFFFFF',
+                },
+                '&:disabled': {
+                  borderColor: '#2A2A2A',
+                  color: '#2A2A2A',
+                },
+              }}
+            >
+              Clear
+            </Button>
+          </Box>
+        </Box>
+        
+        {/* Mode Description */}
+        <Typography variant="body2" sx={{ mb: 3, color: '#A0A0A0' }}>
+          {isTestMode ? 'Using test API with predefined responses' : 'Using live API with real-time analysis'}
         </Typography>
         
         {/* Search Input */}
@@ -82,7 +205,7 @@ const SearchPage = () => {
               Enter VIN Number
             </Typography>
             <Typography variant="body2" sx={{ mb: 2, color: '#A0A0A0' }}>
-              Enter the 17-character Vehicle Identification Number to get detailed vehicle information - ZPBUA1ZL9KLA00848
+              Enter the 17-character Vehicle Identification Number to get detailed vehicle information
             </Typography>
             
             <Grid container spacing={2} alignItems="center">
@@ -90,7 +213,7 @@ const SearchPage = () => {
                 <TextField
                   fullWidth
                   label="VIN Number"
-                  placeholder="ZPBUA1ZL9KLA00848"
+                  placeholder="1G1ZD5ST8JF134138"
                   value={vin}
                   onChange={(e) => setVin(e.target.value.toUpperCase())}
                   error={!!error}
@@ -138,105 +261,66 @@ const SearchPage = () => {
                 </Button>
               </Grid>
             </Grid>
+
+            {/* Test VIN Quick Select */}
+            {isTestMode && (
+              <Box sx={{ mt: 3 }}>
+                <Typography variant="body2" sx={{ mb: 2, color: '#A0A0A0' }}>
+                  Quick Test VINs:
+                </Typography>
+                <ButtonGroup variant="outlined" size="small">
+                  {testVins.map((testVin) => (
+                    <Button
+                      key={testVin.vin}
+                      onClick={() => handleTestVinSelect(testVin.vin)}
+                      sx={{
+                        color: 'rgb(171, 159, 242)',
+                        borderColor: 'rgb(171, 159, 242)',
+                        '&:hover': {
+                          borderColor: 'rgb(157, 143, 239)',
+                          color: 'rgb(157, 143, 239)',
+                        },
+                      }}
+                    >
+                      {testVin.name}
+                    </Button>
+                  ))}
+                </ButtonGroup>
+              </Box>
+            )}
           </CardContent>
         </Card>
 
-        {/* Search Results */}
-        {searchResults && (
-          <Card>
-            <CardContent>
-              <Typography variant="h6" sx={{ mb: 2, color: '#FFFFFF' }}>
-                Vehicle Information
+        {/* View Results Button */}
+        {searchResults && !isDrawerOpen && (
+          <Card sx={{ mt: 2, bgcolor: 'rgba(171, 159, 242, 0.1)', border: '1px solid rgba(171, 159, 242, 0.3)' }}>
+            <CardContent sx={{ textAlign: 'center', py: 2 }}>
+              <Typography variant="body2" sx={{ color: '#A0A0A0', mb: 2 }}>
+                Vehicle analysis complete! View detailed results below.
               </Typography>
-              
-              {/* Basic Info */}
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="h5" sx={{ mb: 1, color: '#FFFFFF', fontWeight: 600 }}>
-                  {searchResults.year} {searchResults.make} {searchResults.model} {searchResults.trim}
-                </Typography>
-                <Typography variant="body2" sx={{ color: '#A0A0A0', mb: 2 }}>
-                  VIN: {searchResults.vin}
-                </Typography>
-              </Box>
-
-              <Divider sx={{ mb: 3, borderColor: '#2A2A2A' }} />
-
-              {/* Vehicle Details */}
-              <Grid container spacing={2} sx={{ mb: 3 }}>
-                <Grid item xs={6}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <DirectionsCar sx={{ mr: 1, color: 'rgb(171, 159, 242)' }} />
-                    <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
-                      Body Style
-                    </Typography>
-                  </Box>
-                  <Typography variant="body1" sx={{ color: '#FFFFFF' }}>
-                    {searchResults.bodyStyle}
-                  </Typography>
-                </Grid>
-                
-                <Grid item xs={6}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <Build sx={{ mr: 1, color: 'rgb(171, 159, 242)' }} />
-                    <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
-                      Engine
-                    </Typography>
-                  </Box>
-                  <Typography variant="body1" sx={{ color: '#FFFFFF' }}>
-                    {searchResults.engine}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={6}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <Person sx={{ mr: 1, color: 'rgb(171, 159, 242)' }} />
-                    <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
-                      Seats
-                    </Typography>
-                  </Box>
-                  <Typography variant="body1" sx={{ color: '#FFFFFF' }}>
-                    {searchResults.seats}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={6}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <DirectionsCar sx={{ mr: 1, color: 'rgb(171, 159, 242)' }} />
-                    <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
-                      Drivetrain
-                    </Typography>
-                  </Box>
-                  <Typography variant="body1" sx={{ color: '#FFFFFF' }}>
-                    {searchResults.drivetrain}
-                  </Typography>
-                </Grid>
-              </Grid>
-
-              <Divider sx={{ mb: 3, borderColor: '#2A2A2A' }} />
-
-              {/* Features */}
-              <Box>
-                <Typography variant="h6" sx={{ mb: 2, color: '#FFFFFF' }}>
-                  Features
-                </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  {searchResults.features.map((feature, index) => (
-                    <Chip
-                      key={index}
-                      label={feature}
-                      size="small"
-                      sx={{
-                        bgcolor: 'rgba(171, 159, 242, 0.1)',
-                        color: 'rgb(171, 159, 242)',
-                        border: '1px solid rgba(171, 159, 242, 0.3)',
-                      }}
-                    />
-                  ))}
-                </Box>
-              </Box>
+              <Button
+                variant="contained"
+                onClick={handleOpenDrawer}
+                startIcon={<Search />}
+                sx={{
+                  bgcolor: 'rgb(171, 159, 242)',
+                  '&:hover': {
+                    bgcolor: 'rgb(157, 143, 239)',
+                  },
+                }}
+              >
+                View {searchResults?.vehicle?.year} {searchResults?.vehicle?.make} {searchResults?.vehicle?.model} Analysis
+              </Button>
             </CardContent>
           </Card>
         )}
+
+        {/* Vehicle Information Drawer */}
+        <VehicleInfoDrawer 
+          searchResults={searchResults}
+          onClose={handleCloseDrawer}
+          open={isDrawerOpen}
+        />
 
         {/* Error Display */}
         {error && (

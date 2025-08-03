@@ -12,7 +12,7 @@ import {
 } from '@mui/icons-material'
 import { Icon } from '@iconify/react'
 
-const Header = ({ accountName = "Drive ValueAI", accountId = "CW" }) => {
+const Header = ({ accountName = "Drive Value AI", accountId = "DV" }) => {
   return (
     <AppBar position="sticky" elevation={1} sx={{ py: 1 }}>
       <Toolbar>
