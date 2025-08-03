@@ -12,7 +12,11 @@ import {
   CircularProgress,
   Switch,
   FormControlLabel,
-  ButtonGroup
+  ButtonGroup,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel
 } from '@mui/material'
 import { Search } from '@mui/icons-material'
 import Header from '../components/Header'
@@ -25,6 +29,7 @@ const SearchPage = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [error, setError] = useState('')
   const [isTestMode, setIsTestMode] = useState(false)
+  const [vehicleCondition, setVehicleCondition] = useState('good')
 
   // Test VINs for quick selection
   const testVins = [
@@ -58,7 +63,10 @@ const SearchPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ vin: vin.toUpperCase() })
+        body: JSON.stringify({ 
+          vin: vin.toUpperCase(),
+          condition: vehicleCondition
+        })
       })
 
       if (!response.ok) {
@@ -118,6 +126,7 @@ const SearchPage = () => {
 
   const handleClear = () => {
     setVin('')
+    setVehicleCondition('good')
     setSearchResults(null)
     setIsDrawerOpen(false)
     setError('')
@@ -209,7 +218,7 @@ const SearchPage = () => {
             </Typography>
             
             <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} sm={8}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   label="VIN Number"
@@ -240,7 +249,37 @@ const SearchPage = () => {
                   }}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={3}>
+                <FormControl fullWidth>
+                  <InputLabel sx={{ color: '#A0A0A0' }}>Condition</InputLabel>
+                  <Select
+                    value={vehicleCondition}
+                    onChange={(e) => setVehicleCondition(e.target.value)}
+                    label="Condition"
+                    sx={{
+                      color: '#FFFFFF',
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#2A2A2A',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgb(171, 159, 242)',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgb(171, 159, 242)',
+                      },
+                      '& .MuiSvgIcon-root': {
+                        color: '#A0A0A0',
+                      },
+                    }}
+                  >
+                    <MenuItem value="excellent">Excellent</MenuItem>
+                    <MenuItem value="good">Good</MenuItem>
+                    <MenuItem value="fair">Fair</MenuItem>
+                    <MenuItem value="poor">Poor</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={3}>
                 <Button
                   fullWidth
                   variant="contained"
