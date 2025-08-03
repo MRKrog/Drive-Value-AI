@@ -136,6 +136,29 @@ export const VehicleInfoDrawer = ({ searchResults, onClose, open = false }) => {
             <Typography variant="body2" sx={{ color: '#A0A0A0', mb: 2 }}>
               VIN: {searchResults?.vin} | Engine: {searchResults?.vehicle?.engine} | Transmission: {searchResults?.vehicle?.transmission}
             </Typography>
+            {/* Condition Display */}
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Chip
+                label={`Condition: ${searchResults?.condition?.charAt(0).toUpperCase() + searchResults?.condition?.slice(1)}`}
+                sx={{
+                  bgcolor: searchResults?.condition === 'excellent' ? 'rgba(76, 175, 80, 0.2)' :
+                           searchResults?.condition === 'good' ? 'rgba(33, 150, 243, 0.2)' :
+                           searchResults?.condition === 'fair' ? 'rgba(255, 152, 0, 0.2)' :
+                           'rgba(244, 67, 54, 0.2)',
+                  color: searchResults?.condition === 'excellent' ? '#4CAF50' :
+                         searchResults?.condition === 'good' ? '#2196F3' :
+                         searchResults?.condition === 'fair' ? '#FF9800' :
+                         '#F44336',
+                  border: `1px solid ${
+                    searchResults?.condition === 'excellent' ? 'rgba(76, 175, 80, 0.5)' :
+                    searchResults?.condition === 'good' ? 'rgba(33, 150, 243, 0.5)' :
+                    searchResults?.condition === 'fair' ? 'rgba(255, 152, 0, 0.5)' :
+                    'rgba(244, 67, 54, 0.5)'
+                  }`,
+                  fontWeight: 500
+                }}
+              />
+            </Box>
           </Box>
 
           {/* Executive Summary */}

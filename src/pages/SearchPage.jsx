@@ -82,6 +82,7 @@ const SearchPage = () => {
           vin: vin.toUpperCase(),
           analysis: analysis,
           vehicle: data.vehicle, // Include the vehicle object
+          condition: data.condition, // Include the condition from API response
           report_id: data.report_id,
           timestamp: data.timestamp,
           generated_by: data.generated_by,
