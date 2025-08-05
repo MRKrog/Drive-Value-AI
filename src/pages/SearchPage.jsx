@@ -30,6 +30,8 @@ const SearchPage = () => {
   const [error, setError] = useState('')
   const [isTestMode, setIsTestMode] = useState(false)
   const [vehicleCondition, setVehicleCondition] = useState('good')
+  const [isEnhancedMode, setIsEnhancedMode] = useState(false)
+  const [mileage, setMileage] = useState('')
 
   // Test VINs for quick selection
   const testVins = [
@@ -54,9 +56,14 @@ const SearchPage = () => {
     setSearchResults(null)
 
     try {
-      const apiEndpoint = isTestMode 
-        ? 'https://autovalidation-backend-production.up.railway.app/api/test-valuation'
-        : 'https://autovalidation-backend-production.up.railway.app/api/valuation'
+      let apiEndpoint
+      if (isTestMode) {
+        apiEndpoint = 'https://autovalidation-backend-production.up.railway.app/api/test-valuation'
+      } else if (isEnhancedMode) {
+        apiEndpoint = 'https://autovalidation-backend-production.up.railway.app/api/valuation/enhanced'
+      } else {
+        apiEndpoint = 'https://autovalidation-backend-production.up.railway.app/api/valuation'
+      }
       
       const response = await fetch(apiEndpoint, {
         method: 'POST',
@@ -65,7 +72,8 @@ const SearchPage = () => {
         },
         body: JSON.stringify({ 
           vin: vin.toUpperCase(),
-          condition: vehicleCondition
+          condition: vehicleCondition,
+          ...(mileage && { mileage: parseInt(mileage) })
         })
       })
 
@@ -75,32 +83,16 @@ const SearchPage = () => {
 
       const data = await response.json()
       
-      if (data.analysis) {
-        // Parse the analysis data and extract vehicle information
-        const analysis = data.analysis
+      if (data.ai_valuation || data.analysis) {
+        // Pass the entire API response to the drawer for comprehensive analysis
         const results = {
-          vin: vin.toUpperCase(),
-          analysis: analysis,
-          vehicle: data.vehicle, // Include the vehicle object
-          condition: data.condition, // Include the condition from API response
-          report_id: data.report_id,
-          timestamp: data.timestamp,
-          generated_by: data.generated_by,
-          // Extract basic vehicle info from vehicle object
+          ...data, // Include all API response data
+          // Maintain backward compatibility
+          analysis: data.ai_valuation || data.analysis,
+          // Extract basic vehicle info for button display
           make: data.vehicle?.make || 'Unknown',
           model: data.vehicle?.model || 'Unknown',
           year: data.vehicle?.year || 'Unknown',
-          trim: data.vehicle?.trim || 'Unknown',
-          engine: data.vehicle?.engine || 'Unknown',
-          transmission: data.vehicle?.transmission || 'Unknown',
-          drivetrain: data.vehicle?.drivetrain || 'Unknown',
-          fuelType: data.vehicle?.fuelType || 'Unknown',
-          bodyStyle: data.vehicle?.bodyStyle || 'Unknown',
-          doors: data.vehicle?.doors || 'Unknown',
-          seats: data.vehicle?.seats || 'Unknown',
-          mileage: data.vehicle?.mileage || 'Unknown',
-          color: data.vehicle?.color || 'Unknown',
-          features: data.vehicle?.features || []
         }
         setSearchResults(results)
         setIsDrawerOpen(true) // Open drawer when results are received
@@ -128,6 +120,8 @@ const SearchPage = () => {
   const handleClear = () => {
     setVin('')
     setVehicleCondition('good')
+    setIsEnhancedMode(false)
+    setMileage('')
     setSearchResults(null)
     setIsDrawerOpen(false)
     setError('')
@@ -160,6 +154,7 @@ const SearchPage = () => {
                 <Switch
                   checked={isTestMode}
                   onChange={(e) => setIsTestMode(e.target.checked)}
+                  disabled={isEnhancedMode}
                   sx={{
                     '& .MuiSwitch-switchBase.Mui-checked': {
                       color: 'rgb(171, 159, 242)',
@@ -176,6 +171,8 @@ const SearchPage = () => {
                 </Typography>
               }
             />
+            
+
             
             {/* Clear Button */}
             <Button
@@ -205,20 +202,50 @@ const SearchPage = () => {
         
         {/* Mode Description */}
         <Typography variant="body2" sx={{ mb: 3, color: '#A0A0A0' }}>
-          {isTestMode ? 'Using test API with predefined responses' : 'Using live API with real-time analysis'}
+          {isTestMode ? 'Using test API with predefined responses' : 
+           isEnhancedMode ? 'Using enhanced API with in-depth analysis and external data' : 
+           'Using live API with real-time analysis'}
         </Typography>
         
         {/* Search Input */}
         <Card sx={{ mb: 3 }}>
           <CardContent>
-            <Typography variant="h6" sx={{ mb: 2, color: '#FFFFFF' }}>
-              Enter VIN Number
-            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6" sx={{ color: '#FFFFFF' }}>
+                Enter VIN Number
+              </Typography>
+              
+              {/* Enhanced Mode Toggle */}
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isEnhancedMode}
+                    onChange={(e) => setIsEnhancedMode(e.target.checked)}
+                    disabled={isTestMode}
+                    size="small"
+                    sx={{
+                      '& .MuiSwitch-switchBase.Mui-checked': {
+                        color: '#4CAF50',
+                      },
+                      '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                        backgroundColor: '#4CAF50',
+                      },
+                    }}
+                  />
+                }
+                label={
+                  <Typography sx={{ color: '#FFFFFF', fontSize: '0.75rem' }}>
+                    Enhanced
+                  </Typography>
+                }
+              />
+            </Box>
             <Typography variant="body2" sx={{ mb: 2, color: '#A0A0A0' }}>
-              Enter the 17-character Vehicle Identification Number to get detailed vehicle information
+              Enter the 17-character Vehicle Identification Number and current mileage for accurate AI-powered valuation
             </Typography>
             
             <Grid container spacing={2} alignItems="center">
+              {/* VIN Input - Full width on mobile, half on desktop */}
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
@@ -226,6 +253,7 @@ const SearchPage = () => {
                   placeholder="1G1ZD5ST8JF134138"
                   value={vin}
                   onChange={(e) => setVin(e.target.value.toUpperCase())}
+                  onKeyPress={handleKeyPress}
                   error={!!error}
                   helperText={error}
                   sx={{
@@ -250,7 +278,42 @@ const SearchPage = () => {
                   }}
                 />
               </Grid>
-              <Grid item xs={12} sm={3}>
+
+              {/* Mileage Input */}
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Current Mileage (Optional)"
+                  placeholder="80000"
+                  type="number"
+                  value={mileage}
+                  onChange={(e) => setMileage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      color: '#FFFFFF',
+                      '& fieldset': {
+                        borderColor: '#2A2A2A',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: 'rgb(171, 159, 242)',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: 'rgb(171, 159, 242)',
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#A0A0A0',
+                    },
+                    '& .MuiInputLabel-root.Mui-focused': {
+                      color: 'rgb(171, 159, 242)',
+                    },
+                  }}
+                />
+              </Grid>
+
+              {/* Condition Select */}
+              <Grid item xs={6} sm={3}>
                 <FormControl fullWidth>
                   <InputLabel sx={{ color: '#A0A0A0' }}>Condition</InputLabel>
                   <Select
@@ -280,7 +343,9 @@ const SearchPage = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={3}>
+
+              {/* Search Button */}
+              <Grid item xs={6} sm={3}>
                 <Button
                   fullWidth
                   variant="contained"

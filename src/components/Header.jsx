@@ -19,7 +19,12 @@ const Header = ({ accountName = "Drive Value AI", accountId = "DV" }) => {
         <Avatar sx={{ mr: 2, bgcolor: 'primary.secondary', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Icon icon="mdi:car" width={18} height={18} />
         </Avatar>
-        <Typography variant="body1" sx={{ flexGrow: 1 }}>
+        <Typography 
+          variant="h6" 
+          sx={{ 
+            flexGrow: 1
+          }}
+        >
           {accountName}
         </Typography>
         <IconButton color="inherit" size="small">

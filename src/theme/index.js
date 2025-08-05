@@ -105,16 +105,57 @@ export const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-    h3: {
+    fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica", "Arial", sans-serif',
+    h1: {
+      fontFamily: '"Space Grotesk", sans-serif',
+      fontWeight: 700,
+      color: '#FFFFFF',
+      letterSpacing: '-0.02em',
+    },
+    h2: {
+      fontFamily: '"Space Grotesk", sans-serif',
       fontWeight: 600,
       color: '#FFFFFF',
+      letterSpacing: '-0.02em',
+    },
+    h3: {
+      fontFamily: '"Space Grotesk", sans-serif',
+      fontWeight: 600,
+      color: '#FFFFFF',
+      letterSpacing: '-0.02em',
+    },
+    h4: {
+      fontFamily: '"Space Grotesk", sans-serif',
+      fontWeight: 600,
+      color: '#FFFFFF',
+      letterSpacing: '-0.02em',
+    },
+    h5: {
+      fontFamily: '"Space Grotesk", sans-serif',
+      fontWeight: 600,
+      color: '#FFFFFF',
+      letterSpacing: '-0.02em',
+    },
+    h6: {
+      fontFamily: '"Space Grotesk", sans-serif',
+      fontWeight: 600,
+      color: '#FFFFFF',
+      letterSpacing: '-0.02em',
     },
     body1: {
-      fontWeight: 500,
+      fontWeight: 400,
       color: '#FFFFFF',
     },
     body2: {
+      fontWeight: 400,
+      color: '#A0A0A0',
+    },
+    button: {
+      fontWeight: 500,
+      textTransform: 'none',
+    },
+    caption: {
+      fontWeight: 400,
       color: '#A0A0A0',
     },
   },
