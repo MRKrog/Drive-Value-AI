@@ -35,10 +35,10 @@ export const theme = createTheme({
           marginBottom: 0, // Remove default margin to control spacing manually
           borderRadius: 12,
           border: 'none', // No border to match the clean look
-          '&:hover': {
-            backgroundColor: '#1F1F1F', // Very subtle hover effect
-            transition: 'background-color 0.2s ease',
-          },
+          // '&:hover': {
+          //   backgroundColor: '#1F1F1F', // Very subtle hover effect
+          //   transition: 'background-color 0.2s ease',
+          // },
         },
       },
     },
