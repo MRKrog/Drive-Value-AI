@@ -9,8 +9,8 @@ import {
 
 const BottomNavigation = ({ currentPage, onPageChange }) => {
   const navigationItems = [
-    { label: 'Search', value: 'search', icon: <Search sx={{ fontSize: 30 }} /> },
     { label: 'Home', value: 'home', icon: <Home sx={{ fontSize: 30 }} /> },
+    { label: 'Search', value: 'search', icon: <Search sx={{ fontSize: 30 }} /> },
     { label: 'Swap', value: 'swap', icon: <SwapHoriz sx={{ fontSize: 30 }} /> },
     { label: 'History', value: 'history', icon: <History sx={{ fontSize: 30 }} /> },
   ]
