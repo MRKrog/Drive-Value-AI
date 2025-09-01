@@ -2,7 +2,7 @@ import React from 'react'
 import { BottomNavigation as MuiBottomNavigation, BottomNavigationAction } from '@mui/material'
 import {
   Home,
-  SwapHoriz,
+  Person,
   History,
   Search
 } from '@mui/icons-material'
@@ -11,7 +11,7 @@ const BottomNavigation = ({ currentPage, onPageChange }) => {
   const navigationItems = [
     { label: 'Home', value: 'home', icon: <Home sx={{ fontSize: 30 }} /> },
     { label: 'Search', value: 'search', icon: <Search sx={{ fontSize: 30 }} /> },
-    { label: 'Swap', value: 'swap', icon: <SwapHoriz sx={{ fontSize: 30 }} /> },
+    { label: 'Profile', value: 'swap', icon: <Person sx={{ fontSize: 30 }} /> },
     { label: 'History', value: 'history', icon: <History sx={{ fontSize: 30 }} /> },
   ]
 

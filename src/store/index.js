@@ -2,12 +2,14 @@ import { configureStore } from '@reduxjs/toolkit'
 import vehicleValuationReducer from './slices/vehicleValuationSlice'
 import searchReducer from './slices/searchSlice'
 import uiReducer from './slices/uiSlice'
+import userReducer from './slices/userSlice'
 
 export const store = configureStore({
   reducer: {
     vehicleValuation: vehicleValuationReducer,
     search: searchReducer,
     ui: uiReducer,
+    user: userReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
