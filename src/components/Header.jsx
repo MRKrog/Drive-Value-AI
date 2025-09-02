@@ -27,12 +27,12 @@ const Header = ({ accountName = "Drive Value AI", accountId = "DV" }) => {
         >
           {accountName}
         </Typography>
-        <IconButton color="inherit" size="small">
+        {/* <IconButton color="inherit" size="small">
           <ContentCopy fontSize="small" />
-        </IconButton>
-        <IconButton color="inherit" size="small">
+        </IconButton> */}
+        {/* <IconButton color="inherit" size="small">
           <Fullscreen />
-        </IconButton>
+        </IconButton> */}
       </Toolbar>
     </AppBar>
   )

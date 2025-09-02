@@ -19,7 +19,7 @@ function CryptoWalletApp() {
   const renderPage = () => {
     switch (currentPage) {
       case 'home':
-        return <HomePage />
+        return <HomePage onPageChange={setCurrentPage} />
       case 'search':
         return <SearchPage />
       case 'swap':
@@ -27,7 +27,7 @@ function CryptoWalletApp() {
       case 'history':
         return <HistoryPage />
       default:
-        return <HomePage />
+        return <HomePage onPageChange={setCurrentPage} />
     }
   }
 
