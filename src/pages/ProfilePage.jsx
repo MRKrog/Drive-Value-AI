@@ -22,7 +22,7 @@ import {
 } from '@mui/icons-material'
 import { useAppSelector } from '../store/hooks'
 
-const SwapPage = () => {
+const ProfilePage = () => {
   const user = useAppSelector(state => state.user)
   
   return (
@@ -227,4 +227,4 @@ const SwapPage = () => {
   )
 }
 
-export default SwapPage 
+export default ProfilePage 

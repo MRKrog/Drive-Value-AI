@@ -23,14 +23,14 @@ const HomePage = ({ onPageChange }) => {
       overflow: 'auto',
       '&::-webkit-scrollbar': { display: 'none' },
       msOverflowStyle: 'none',
-      scrollbarWidth: 'none'
+      scrollbarWidth: 'none',
+      height: '100%',
+      background: 'linear-gradient(135deg, rgba(171, 159, 242, 0.1) 0%, rgba(76, 175, 80, 0.1) 100%)' ,
+      py: 3
     }}>
-      <Container maxWidth="sm" sx={{ py: 3 }}>
+      <Container maxWidth="sm">
 
-        <Box 
-        // sx={{ background: 'linear-gradient(135deg, rgba(171, 159, 242, 0.1) 0%, rgba(76, 175, 80, 0.1) 100%)' }}
-        >
-
+        <Box>
           <Grid container spacing={4} alignItems="center">
             <Grid item xs={12} md={6}>
               <Typography variant="h2" sx={{ 

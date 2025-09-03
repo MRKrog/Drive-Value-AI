@@ -7,7 +7,7 @@ import { Box } from '@mui/material'
 import { theme } from './theme'
 import { store } from './store'
 import HomePage from './pages/HomePage'
-import SwapPage from './pages/SwapPage'
+import ProfilePage from './pages/ProfilePage'
 import HistoryPage from './pages/HistoryPage'
 import SearchPage from './pages/SearchPage'
 import BottomNavigation from './components/BottomNavigation'
@@ -22,8 +22,8 @@ function CryptoWalletApp() {
         return <HomePage onPageChange={setCurrentPage} />
       case 'search':
         return <SearchPage />
-      case 'swap':
-        return <SwapPage />
+      case 'profile':
+        return <ProfilePage />
       case 'history':
         return <HistoryPage />
       default:
