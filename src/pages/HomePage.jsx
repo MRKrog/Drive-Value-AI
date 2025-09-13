@@ -24,11 +24,12 @@ const HomePage = ({ onPageChange }) => {
       '&::-webkit-scrollbar': { display: 'none' },
       msOverflowStyle: 'none',
       scrollbarWidth: 'none',
-      height: '100%',
+      flex: 1,
+      display: 'flex',
+      alignItems: 'center',
       background: 'linear-gradient(135deg, rgba(171, 159, 242, 0.1) 0%, rgba(76, 175, 80, 0.1) 100%)' ,
-      py: 3
     }}>
-      <Container maxWidth="sm">
+      <Container maxWidth="md">
 
         <Box>
           <Grid container spacing={4} alignItems="center">

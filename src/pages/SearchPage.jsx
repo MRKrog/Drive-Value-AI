@@ -110,16 +110,17 @@ const SearchPage = () => {
   }
 
   return (
-    <Box sx={{ 
-      // pb: 7, 
-      // height: '100vh', 
+    <Box sx={{
       overflow: 'auto',
       '&::-webkit-scrollbar': { display: 'none' },
       msOverflowStyle: 'none',
-      scrollbarWidth: 'none' 
+      scrollbarWidth: 'none',
+      flex: 1,
+      minHeight: '100%'
     }}>
 
-      <Container maxWidth="sm" sx={{ py: 3 }}>
+      <Container maxWidth="md" sx={{ py: 2 }}>
+
         {/* Page Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Box>

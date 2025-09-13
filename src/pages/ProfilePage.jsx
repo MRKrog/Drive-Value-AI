@@ -26,8 +26,9 @@ const ProfilePage = () => {
   const user = useAppSelector(state => state.user)
   
   return (
-    <Box sx={{ pb: 7 }}>
-      <Container maxWidth="md" sx={{ py: 3 }}>
+    <Box sx={{ flex: 1 }}>
+      <Container maxWidth="md" sx={{ py: 2 }}>
+
         <Typography variant="h4" sx={{ mb: 4, color: '#FFFFFF', textAlign: 'center' }}>
           User Profile
         </Typography>

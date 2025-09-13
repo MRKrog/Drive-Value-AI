@@ -4,15 +4,33 @@ import {
   Toolbar,
   Typography,
   IconButton,
-  Avatar
+  Avatar,
+  Button
 } from '@mui/material'
 import {
   ContentCopy,
-  Fullscreen
+  Fullscreen,
+  Logout
 } from '@mui/icons-material'
 import { Icon } from '@iconify/react'
+import { useAuth } from '../contexts/AuthContext'
+import { useNavigate } from 'react-router-dom'
+import { PATH_AUTH } from '../routes/paths'
 
 const Header = ({ accountName = "Drive Value AI", accountId = "DV" }) => {
+  const { logout } = useAuth()
+  const navigate = useNavigate()
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+      // Navigate to login page after logout
+      navigate(PATH_AUTH.login, { replace: true })
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
+  }
+
   return (
     <AppBar position="fixed" elevation={1} sx={{ py: 1, zIndex: 1200 }}>
       <Toolbar>
@@ -27,12 +45,23 @@ const Header = ({ accountName = "Drive Value AI", accountId = "DV" }) => {
         >
           {accountName}
         </Typography>
-        {/* <IconButton color="inherit" size="small">
-          <ContentCopy fontSize="small" />
-        </IconButton> */}
-        {/* <IconButton color="inherit" size="small">
-          <Fullscreen />
-        </IconButton> */}
+        
+        {/* Logout Button */}
+        <Button
+          color="inherit"
+          startIcon={<Logout />}
+          onClick={handleLogout}
+          sx={{
+            textTransform: 'none',
+            fontWeight: 500,
+            px: 2,
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            },
+          }}
+        >
+          Logout
+        </Button>
       </Toolbar>
     </AppBar>
   )

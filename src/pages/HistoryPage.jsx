@@ -9,8 +9,8 @@ import {
 
 const HistoryPage = () => {
   return (
-    <Box sx={{ pb: 7 }}>
-      <Container maxWidth="sm" sx={{ py: 3 }}>
+    <Box sx={{ flex: 1, minHeight: '100%' }}>
+      <Container maxWidth="md" sx={{ py: 2 }}>
         <Typography variant="h5" sx={{ mb: 3 }}>
           Transaction History
         </Typography>
