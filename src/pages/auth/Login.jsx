@@ -59,7 +59,7 @@ export default function Login() {
   };
 
   return (
-    <Card sx={{ backgroundColor: 'background.default' }}>
+    <Card>
       <CardContent sx={{ p: 4 }}>
         <Typography variant="h4" sx={{ mb: 3, textAlign: 'center' }}>
           Sign In
@@ -124,7 +124,12 @@ export default function Login() {
           </Button>
           
           <Box sx={{ textAlign: 'center' }}>
-            <Link component={RouterLink} to={PATH_AUTH.register} variant="body2">
+            <Link 
+              component={RouterLink} 
+              to={PATH_AUTH.register} 
+              variant="body2"
+              sx={{ color: '#6B7280', textDecorationColor: '#6B7280', '&:hover': { color: '#818181' } }}
+            >
               Don't have an account? Sign Up
             </Link>
           </Box>

@@ -5,15 +5,15 @@ export const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: 'rgb(171, 159, 242)', // Exact purple color from user
-      light: 'rgb(185, 175, 245)',
-      dark: 'rgb(157, 143, 239)',
+      main: '#C3FF51', // Bright green button color
+      light: '#D1FF7A',
+      dark: '#B0E647',
     },
     secondary: {
       main: 'rgb(171, 159, 242)', // Same purple for consistency
     },
     background: {
-      default: 'rgb(31, 31, 31)', // Exact background color from user
+      default: '#151718', // Updated background color
       paper: '#1A1A1A', // Slightly lighter dark grey for cards
     },
     text: {
@@ -31,14 +31,12 @@ export const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          backgroundColor: '#1A1A1A', // Slightly lighter dark grey
+          backgroundColor: '#1a1d1e', // Slightly lighter dark grey
+          backgroundImage: 'none', // Remove the gradient background
           marginBottom: 0, // Remove default margin to control spacing manually
           borderRadius: 12,
-          border: 'none', // No border to match the clean look
-          // '&:hover': {
-          //   backgroundColor: '#1F1F1F', // Very subtle hover effect
-          //   transition: 'background-color 0.2s ease',
-          // },
+          // border: 'none', // No border to match the clean look
+          border: '1px solid #2b2f31'
         },
       },
     },
@@ -56,7 +54,7 @@ export const theme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: 'rgb(31, 31, 31)', // Exact background color from user
+          backgroundColor: '#151718', // Updated background color
           borderBottom: 'none', // No border for seamless look
         },
       },
