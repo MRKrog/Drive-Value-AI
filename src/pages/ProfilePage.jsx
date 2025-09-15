@@ -153,7 +153,7 @@ const ProfilePage = () => {
           </Grid>
           
           {/* Recent Searches */}
-          <Grid item xs={12} md={6}>
+          {/* <Grid item xs={12} md={6}>
             <Card sx={{ bgcolor: 'rgba(76, 175, 80, 0.1)', border: '1px solid rgba(76, 175, 80, 0.3)' }}>
               <CardContent>
                 <Typography variant="h6" sx={{ color: '#FFFFFF', mb: 3, display: 'flex', alignItems: 'center' }}>
@@ -186,11 +186,12 @@ const ProfilePage = () => {
                 </Stack>
               </CardContent>
             </Card>
-          </Grid>
+          </Grid> */}
+
         </Grid>
 
         {/* Favorites Section */}
-        <Card sx={{ mt: 4, bgcolor: 'rgba(171, 159, 242, 0.1)', border: '1px solid rgba(171, 159, 242, 0.3)' }}>
+        {/* <Card sx={{ mt: 4, bgcolor: 'rgba(171, 159, 242, 0.1)', border: '1px solid rgba(171, 159, 242, 0.3)' }}>
           <CardContent>
             <Typography variant="h6" sx={{ color: '#FFFFFF', mb: 3, display: 'flex', alignItems: 'center' }}>
               <Favorite sx={{ mr: 1, color: 'rgb(171, 159, 242)' }} />
@@ -222,7 +223,8 @@ const ProfilePage = () => {
               ))}
             </Grid>
           </CardContent>
-        </Card>
+        </Card> */}
+
       </Container>
     </Box>
   )
