@@ -8,24 +8,27 @@ import {
   Typography,
   Link,
   Alert,
+  Divider,
 } from '@mui/material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { GoogleLogin } from '@react-oauth/google';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { register, loginWithGoogle } from '../../store/slices/userSlice';
 import { PATH_AUTH, PATH_AFTER_LOGIN } from '../../routes/paths';
 
 // ----------------------------------------------------------------------
 
 export default function Register() {
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const dispatch = useAppDispatch();
+  const { loading, error } = useAppSelector(state => state.user);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     password: '',
   });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [localError, setLocalError] = useState('');
 
   const handleChange = (e) => {
     setFormData({
@@ -36,17 +39,34 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
+    setLocalError('');
 
     try {
-      await register(formData.email, formData.password, formData.firstName, formData.lastName);
+      await dispatch(register({
+        email: formData.email,
+        password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName
+      })).unwrap();
       navigate(PATH_AFTER_LOGIN);
     } catch (err) {
-      setError(err.message || 'Registration failed');
-    } finally {
-      setLoading(false);
+      setLocalError(err.message || 'Registration failed');
     }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setLocalError('');
+
+    try {
+      await dispatch(loginWithGoogle(credentialResponse)).unwrap();
+      navigate(PATH_AFTER_LOGIN);
+    } catch (err) {
+      setLocalError(err.message || 'Google registration failed');
+    }
+  };
+
+  const handleGoogleError = () => {
+    setLocalError('Google registration failed. Please try again.');
   };
 
   return (
@@ -56,11 +76,30 @@ export default function Register() {
           Sign Up
         </Typography>
         
-        {error && (
+        {(error || localError) && (
           <Alert severity="error" sx={{ mb: 3 }}>
-            {error}
+            {error || localError}
           </Alert>
         )}
+
+        {/* Google OAuth Registration */}
+        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+            size="large"
+            shape="rectangular"
+            theme="filled_black"
+            text="signup_with"
+            disabled={loading}
+          />
+        </Box>
+
+        <Divider sx={{ my: 3 }}>
+          <Typography variant="body2" sx={{ color: 'text.secondary', px: 2 }}>
+            Or create account with email
+          </Typography>
+        </Divider>
 
         <Box component="form" onSubmit={handleSubmit}>
           <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>

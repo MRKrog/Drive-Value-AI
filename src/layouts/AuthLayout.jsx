@@ -11,7 +11,6 @@ export default function AuthLayout() {
       width: '100%',
     }}>
       <Box sx={{ 
-        // backgroundColor: 'background.default',
         width: '100%',
         height: '100%',
         display: 'flex',

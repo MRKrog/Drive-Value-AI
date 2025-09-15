@@ -12,50 +12,45 @@ import {
 } from '@mui/material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { login, loginWithGoogle } from '../../store/slices/userSlice';
 import { PATH_AUTH, PATH_AFTER_LOGIN } from '../../routes/paths';
 
 // ----------------------------------------------------------------------
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login, loginWithGoogle } = useAuth();
+  const dispatch = useAppDispatch();
+  const { loading, error } = useAppSelector(state => state.user);
   const [email, setEmail] = useState('demo@example.com');
   const [password, setPassword] = useState('password');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [localError, setLocalError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
+    setLocalError('');
 
     try {
-      await login(email, password);
+      await dispatch(login({ email, password })).unwrap();
       navigate(PATH_AFTER_LOGIN);
     } catch (err) {
-      setError(err.message || 'Login failed');
-    } finally {
-      setLoading(false);
+      setLocalError(err.message || 'Login failed');
     }
   };
 
   const handleGoogleSuccess = async (credentialResponse) => {
-    setError('');
-    setLoading(true);
+    setLocalError('');
 
     try {
-      await loginWithGoogle(credentialResponse);
+      await dispatch(loginWithGoogle(credentialResponse)).unwrap();
       navigate(PATH_AFTER_LOGIN);
     } catch (err) {
-      setError(err.message || 'Google login failed');
-    } finally {
-      setLoading(false);
+      setLocalError(err.message || 'Google login failed');
     }
   };
 
   const handleGoogleError = () => {
-    setError('Google login failed. Please try again.');
+    setLocalError('Google login failed. Please try again.');
   };
 
   return (
@@ -65,9 +60,9 @@ export default function Login() {
           Sign In
         </Typography>
         
-        {error && (
+        {(error || localError) && (
           <Alert severity="error" sx={{ mb: 3 }}>
-            {error}
+            {error || localError}
           </Alert>
         )}
 
@@ -86,7 +81,7 @@ export default function Login() {
 
         <Divider sx={{ my: 3 }}>
           <Typography variant="body2" sx={{ color: 'text.secondary', px: 2 }}>
-            Or sign in with email
+            Or continue with email
           </Typography>
         </Divider>
 
@@ -134,6 +129,8 @@ export default function Login() {
             </Link>
           </Box>
         </Box>
+        
+
       </CardContent>
     </Card>
   );

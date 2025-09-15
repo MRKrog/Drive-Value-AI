@@ -1,5 +1,6 @@
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+const API_BASE_URL = 'http://localhost:3001/api';
+// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
 
 export const API_ENDPOINTS = {
   // User endpoints
@@ -21,6 +22,7 @@ export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: `${API_BASE_URL}/auth/login`,
     REGISTER: `${API_BASE_URL}/auth/register`,
+    GOOGLE: `${API_BASE_URL}/auth/google`,
     LOGOUT: `${API_BASE_URL}/auth/logout`,
     REFRESH: `${API_BASE_URL}/auth/refresh`,
   }

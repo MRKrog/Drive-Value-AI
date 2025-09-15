@@ -2,6 +2,89 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { API_ENDPOINTS, getFetchOptions } from '../../config/api'
 
+// Auth thunks
+export const login = createAsyncThunk(
+  'user/login',
+  async ({ email, password }, { rejectWithValue }) => {
+    try {
+      const response = await fetch(API_ENDPOINTS.AUTH.LOGIN, getFetchOptions('POST', {
+        email,
+        password,
+      }));
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
+      }
+      
+      const data = await response.json();
+      
+      // Store tokens and user data
+      localStorage.setItem('accessToken', data.data.token);
+      localStorage.setItem('user', JSON.stringify(data.data.user));
+      
+      return data.data.user;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const register = createAsyncThunk(
+  'user/register',
+  async ({ email, password, firstName, lastName }, { rejectWithValue }) => {
+    try {
+      const response = await fetch(API_ENDPOINTS.AUTH.REGISTER, getFetchOptions('POST', {
+        email,
+        password,
+        firstName,
+        lastName,
+      }));
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Registration failed');
+      }
+      
+      const data = await response.json();
+      
+      // Store tokens and user data
+      localStorage.setItem('accessToken', data.data.token);
+      localStorage.setItem('user', JSON.stringify(data.data.user));
+      
+      return data.data.user;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const loginWithGoogle = createAsyncThunk(
+  'user/loginWithGoogle',
+  async (credentialResponse, { rejectWithValue }) => {
+    try {
+      const response = await fetch(API_ENDPOINTS.AUTH.GOOGLE, getFetchOptions('POST', {
+        token: credentialResponse.credential
+      }));
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Google login failed');
+      }
+      
+      const data = await response.json();
+      
+      // Store tokens and user data
+      localStorage.setItem('accessToken', data.data.token);
+      localStorage.setItem('user', JSON.stringify(data.data.user));
+      
+      return data.data.user;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 // Async thunks for API calls
 export const fetchUserProfile = createAsyncThunk(
   'user/fetchProfile',
@@ -85,6 +168,7 @@ const initialState = {
   // Loading states
   loading: false,
   error: null,
+  isInitialized: false,
   
   // Authentication
   isAuthenticated: false,
@@ -139,8 +223,56 @@ const userSlice = createSlice({
     setAuthenticated: (state, action) => {
       state.isAuthenticated = action.payload;
     },
+    initialize: (state) => {
+      // Check localStorage for existing auth (both custom and Google OAuth)
+      const savedUser = localStorage.getItem('user');
+      const accessToken = localStorage.getItem('accessToken');
+      
+      if (accessToken && savedUser) {
+        try {
+          const user = JSON.parse(savedUser);
+          state.isAuthenticated = true;
+          state.profile = {
+            id: user.id,
+            email: user.email,
+            firstName: user.profile?.firstName || '',
+            lastName: user.profile?.lastName || '',
+            name: user.profile?.name || '',
+            avatar: user.profile?.avatar,
+            city: user.profile?.city || '',
+            state: user.profile?.state || '',
+            memberSince: user.createdAt
+          };
+          state.preferences = user.preferences || state.preferences;
+          state.stats = user.stats || state.stats;
+          state.subscription = user.subscription || state.subscription;
+          state.recentSearches = user.recentSearches || [];
+          state.favorites = user.favorites || [];
+        } catch (error) {
+          // Clear invalid data
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('user');
+        }
+      }
+      
+      // Note: Google OAuth state is handled by the GoogleLogin component
+      // and our loginWithGoogle thunk, so no additional Google-specific
+      // initialization is needed here
+      
+      state.isInitialized = true;
+    },
     logout: (state) => {
-      return { ...initialState };
+      // Clear localStorage
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('user');
+      
+      console.log('Logout called');
+      // Clear any Google OAuth related storage
+      // Note: Google OAuth doesn't store additional state in localStorage
+      // but we clear our own auth tokens
+      
+      // Reset state to initial values but keep isInitialized true
+      return { ...initialState, isInitialized: true };
     },
     clearError: (state) => {
       state.error = null;
@@ -171,6 +303,108 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Login
+      .addCase(login.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(login.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = true;
+        
+        // Map backend data to frontend structure
+        const userData = action.payload;
+        state.profile = {
+          id: userData.id,
+          email: userData.email,
+          firstName: userData.profile?.firstName || '',
+          lastName: userData.profile?.lastName || '',
+          name: userData.profile?.name || '',
+          avatar: userData.profile?.avatar,
+          city: userData.profile?.city || '',
+          state: userData.profile?.state || '',
+          memberSince: userData.createdAt
+        };
+        state.preferences = userData.preferences || state.preferences;
+        state.stats = userData.stats || state.stats;
+        state.subscription = userData.subscription || state.subscription;
+        state.recentSearches = userData.recentSearches || [];
+        state.favorites = userData.favorites || [];
+      })
+      .addCase(login.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.isAuthenticated = false;
+      })
+      
+      // Register
+      .addCase(register.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(register.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = true;
+        
+        // Map backend data to frontend structure
+        const userData = action.payload;
+        state.profile = {
+          id: userData.id,
+          email: userData.email,
+          firstName: userData.profile?.firstName || '',
+          lastName: userData.profile?.lastName || '',
+          name: userData.profile?.name || '',
+          avatar: userData.profile?.avatar,
+          city: userData.profile?.city || '',
+          state: userData.profile?.state || '',
+          memberSince: userData.createdAt
+        };
+        state.preferences = userData.preferences || state.preferences;
+        state.stats = userData.stats || state.stats;
+        state.subscription = userData.subscription || state.subscription;
+        state.recentSearches = userData.recentSearches || [];
+        state.favorites = userData.favorites || [];
+      })
+      .addCase(register.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.isAuthenticated = false;
+      })
+      
+      // Google Login
+      .addCase(loginWithGoogle.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginWithGoogle.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = true;
+        
+        // Map backend data to frontend structure
+        const userData = action.payload;
+        state.profile = {
+          id: userData.id,
+          email: userData.email,
+          firstName: userData.profile?.firstName || '',
+          lastName: userData.profile?.lastName || '',
+          name: userData.profile?.name || '',
+          avatar: userData.profile?.avatar,
+          city: userData.profile?.city || '',
+          state: userData.profile?.state || '',
+          memberSince: userData.createdAt
+        };
+        state.preferences = userData.preferences || state.preferences;
+        state.stats = userData.stats || state.stats;
+        state.subscription = userData.subscription || state.subscription;
+        state.recentSearches = userData.recentSearches || [];
+        state.favorites = userData.favorites || [];
+      })
+      .addCase(loginWithGoogle.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.isAuthenticated = false;
+      })
+      
       // Fetch Profile
       .addCase(fetchUserProfile.pending, (state) => {
         state.loading = true;
@@ -272,6 +506,7 @@ const userSlice = createSlice({
 
 export const {
   setAuthenticated,
+  initialize,
   logout,
   clearError,
   updateProfileLocal,

@@ -13,17 +13,19 @@ import {
   Logout
 } from '@mui/icons-material'
 import { Icon } from '@iconify/react'
-import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import { useAppDispatch } from '../store/hooks'
+import { logout } from '../store/slices/userSlice'
 import { PATH_AUTH } from '../routes/paths'
 
 const Header = ({ accountName = "Drive Value AI", accountId = "DV" }) => {
-  const { logout } = useAuth()
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
   const handleLogout = async () => {
     try {
-      await logout()
+      // Clear Redux state and localStorage
+      dispatch(logout())
       // Navigate to login page after logout
       navigate(PATH_AUTH.login, { replace: true })
     } catch (error) {

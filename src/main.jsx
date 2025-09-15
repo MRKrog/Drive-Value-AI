@@ -7,25 +7,29 @@ import CssBaseline from '@mui/material/CssBaseline'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { theme } from './theme'
 import { store } from './store'
-import { AuthProvider } from './contexts/AuthContext'
+import AuthInitializer from './components/AuthInitializer'
 import Router from './routes/Router'
 import './global.css'
 
 function DriveValueApp() {
   // You'll need to set this in your environment variables
-  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "your_google_client_id_here"
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "181168409570-cgi2dgpi40rqrveeklijvkj70suk0ks9.apps.googleusercontent.com"
+  
+  // Debug: Log the client ID to console
+  console.log('Google Client ID:', googleClientId)
+  console.log('Environment variables:', import.meta.env)
   
   return (
     <GoogleOAuthProvider clientId={googleClientId}>
       <Provider store={store}>
-        <AuthProvider>
+        <AuthInitializer>
           <BrowserRouter>
             <ThemeProvider theme={theme}>
               <CssBaseline />
               <Router />
             </ThemeProvider>
           </BrowserRouter>
-        </AuthProvider>
+        </AuthInitializer>
       </Provider>
     </GoogleOAuthProvider>
   )
