@@ -9,18 +9,20 @@ import {
   Card,
   CardContent,
 } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
 import { 
   Search, 
-  DirectionsCar,
   Speed,
   Analytics,
   Security,
 } from '@mui/icons-material'
+import { PATH_DASHBOARD } from '../routes/paths'
 
-const HomePage = ({ onPageChange }) => {
+const HomePage = () => {
+  const navigate = useNavigate()
   
   const handleSearchClick = () => {
-    onPageChange('search')
+    navigate(PATH_DASHBOARD.search)
   }
 
   return (

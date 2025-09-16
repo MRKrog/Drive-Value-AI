@@ -204,10 +204,10 @@ const SearchPage = () => {
         </Card> */}
         
         {/* Search Input Section */}
-        <Card sx={{ mb: 3 }}>
-          <CardContent>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6" sx={{ color: '#FFFFFF' }}>
+        <Card variant="info" sx={{ mb: 4 }}>
+          <CardContent sx={{ py: 4 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+              <Typography variant="h5" sx={{ color: '#FFFFFF', fontWeight: 600 }}>
                 Vehicle Information
               </Typography>
               
@@ -219,19 +219,18 @@ const SearchPage = () => {
                       checked={valuationParameters.isEnhancedMode}
                       onChange={(e) => dispatch(setValuationParameters({ isEnhancedMode: e.target.checked }))}
                       disabled={valuationParameters.isTestMode}
-                      size="small"
                       sx={{
                         '& .MuiSwitch-switchBase.Mui-checked': {
-                          color: '#4CAF50',
+                          color: '#C3FF51',
                         },
                         '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                          backgroundColor: '#4CAF50',
+                          backgroundColor: '#C3FF51',
                         },
                       }}
                     />
                   }
                   label={
-                    <Typography sx={{ color: '#FFFFFF', fontSize: '0.75rem' }}>
+                    <Typography sx={{ color: '#FFFFFF', fontSize: '0.875rem', fontWeight: 500 }}>
                       Enhanced
                     </Typography>
                   }
@@ -239,13 +238,13 @@ const SearchPage = () => {
               </Tooltip>
             </Box>
             
-            <Typography variant="body2" sx={{ mb: 3, color: '#A0A0A0' }}>
+            <Typography variant="body1" sx={{ mb: 4, color: '#A0A0A0', lineHeight: 1.6, maxWidth: '600px' }} textAlign="left">
               Enter the 17-character Vehicle Identification Number (VIN) and optional details for accurate AI-powered valuation
             </Typography>
             
-            <Grid container spacing={2} alignItems="center">
+            <Grid container spacing={3}>
               {/* VIN Input */}
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} md={6}>
                 <Box sx={{ position: 'relative' }}>
                   <TextField
                     fullWidth
@@ -260,27 +259,27 @@ const SearchPage = () => {
                       '& .MuiOutlinedInput-root': {
                         color: '#FFFFFF',
                         '& fieldset': {
-                          borderColor: '#2A2A2A',
+                          borderColor: '#2b2f31',
                         },
                         '&:hover fieldset': {
-                          borderColor: 'rgb(171, 159, 242)',
+                          borderColor: '#C3FF51',
                         },
                         '&.Mui-focused fieldset': {
-                          borderColor: 'rgb(171, 159, 242)',
+                          borderColor: '#C3FF51',
                         },
                       },
                       '& .MuiInputLabel-root': {
                         color: '#A0A0A0',
                       },
                       '& .MuiInputLabel-root.Mui-focused': {
-                        color: 'rgb(171, 159, 242)',
+                        color: '#C3FF51',
                       },
                     }}
                   />
                   <Tooltip title="VIN is a 17-character code that uniquely identifies your vehicle. Find it on your registration, insurance card, or driver's side dashboard.">
                     <Help sx={{ 
                       position: 'absolute', 
-                      right: 8, 
+                      right: 12, 
                       top: '50%', 
                       transform: 'translateY(-50%)',
                       color: '#A0A0A0',
@@ -292,7 +291,7 @@ const SearchPage = () => {
               </Grid>
 
               {/* Mileage Input */}
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
                   label="Current Mileage (Optional)"
@@ -306,27 +305,27 @@ const SearchPage = () => {
                     '& .MuiOutlinedInput-root': {
                       color: '#FFFFFF',
                       '& fieldset': {
-                        borderColor: '#2A2A2A',
+                        borderColor: '#2b2f31',
                       },
                       '&:hover fieldset': {
-                        borderColor: 'rgb(171, 159, 242)',
+                        borderColor: '#C3FF51',
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: 'rgb(171, 159, 242)',
+                        borderColor: '#C3FF51',
                       },
                     },
                     '& .MuiInputLabel-root': {
                       color: '#A0A0A0',
                     },
                     '& .MuiInputLabel-root.Mui-focused': {
-                      color: 'rgb(171, 159, 242)',
+                      color: '#C3FF51',
                     },
                   }}
                 />
               </Grid>
 
               {/* Condition Select */}
-              <Grid item xs={6} sm={3}>
+              <Grid item xs={12} md={4}>
                 <FormControl fullWidth>
                   <InputLabel sx={{ color: '#A0A0A0' }}>Vehicle Condition</InputLabel>
                   <Select
@@ -336,13 +335,13 @@ const SearchPage = () => {
                     sx={{
                       color: '#FFFFFF',
                       '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#2A2A2A',
+                        borderColor: '#2b2f31',
                       },
                       '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'rgb(171, 159, 242)',
+                        borderColor: '#C3FF51',
                       },
                       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'rgb(171, 159, 242)',
+                        borderColor: '#C3FF51',
                       },
                       '& .MuiSvgIcon-root': {
                         color: '#A0A0A0',
@@ -358,20 +357,22 @@ const SearchPage = () => {
               </Grid>
 
               {/* Search Button */}
-              <Grid item xs={6} sm={3}>
+              <Grid item xs={12} md={8}>
                 <Button
                   fullWidth
-                  variant="contained"
+                  variant="secondary"
+                  size="large"
                   onClick={handleSearch}
                   disabled={isSearching || !valuationParameters.vin.trim()}
                   startIcon={isSearching ? <CircularProgress size={20} /> : <Search />}
                   sx={{
-                    bgcolor: 'rgb(171, 159, 242)',
-                    '&:hover': {
-                      bgcolor: 'rgb(157, 143, 239)',
-                    },
+                    height: 56,
+                    fontSize: '1rem',
+                    fontWeight: 600,
                     '&:disabled': {
-                      bgcolor: '#2A2A2A',
+                      backgroundColor: '#2A2A2A',
+                      color: '#666666',
+                      borderColor: '#2A2A2A',
                     },
                   }}
                 >
@@ -382,8 +383,8 @@ const SearchPage = () => {
 
             {/* Test VIN Quick Select */}
             {valuationParameters.isTestMode && (
-              <Box sx={{ mt: 3 }}>
-                <Typography variant="body2" sx={{ mb: 2, color: '#A0A0A0' }}>
+              <Box sx={{ mt: 4, p: 3, bgcolor: 'rgba(195, 255, 81, 0.05)', border: '1px solid rgba(195, 255, 81, 0.2)', borderRadius: 2 }}>
+                <Typography variant="body2" sx={{ mb: 2, color: '#C3FF51', fontWeight: 500 }}>
                   Quick Test VINs (for demonstration):
                 </Typography>
                 <ButtonGroup variant="outlined" size="small">
@@ -392,11 +393,12 @@ const SearchPage = () => {
                       key={testVin.vin}
                       onClick={() => handleTestVinSelect(testVin.vin)}
                       sx={{
-                        color: 'rgb(171, 159, 242)',
-                        borderColor: 'rgb(171, 159, 242)',
+                        color: '#C3FF51',
+                        borderColor: '#C3FF51',
                         '&:hover': {
-                          borderColor: 'rgb(157, 143, 239)',
-                          color: 'rgb(157, 143, 239)',
+                          borderColor: '#B0E647',
+                          color: '#B0E647',
+                          backgroundColor: 'rgba(195, 255, 81, 0.1)',
                         },
                       }}
                     >
@@ -411,28 +413,32 @@ const SearchPage = () => {
 
         {/* View Results Button */}
         {searchResults && !isDrawerOpen && (
-          <Card sx={{ mt: 2, bgcolor: 'rgba(171, 159, 242, 0.1)', border: '1px solid rgba(171, 159, 242, 0.3)' }}>
-            <CardContent sx={{ textAlign: 'center', py: 2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+          <Card variant="info" sx={{ textAlign: 'center' }}>
+            <CardContent sx={{ py: 4 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 3 }}>
                 <Chip 
                   label="Analysis Complete" 
-                  color="success" 
-                  size="small"
-                  sx={{ mr: 1 }}
+                  sx={{ 
+                    bgcolor: 'rgba(195, 255, 81, 0.2)', 
+                    color: '#C3FF51',
+                    fontWeight: 600,
+                    mr: 2
+                  }}
                 />
-                <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                <Typography variant="body1" sx={{ color: '#A0A0A0' }}>
                   Vehicle analysis complete! View detailed results below.
                 </Typography>
               </Box>
               <Button
-                variant="contained"
+                variant="secondary"
+                size="large"
                 onClick={() => dispatch(setDrawerOpen(true))}
                 startIcon={<Search />}
                 sx={{
-                  bgcolor: 'rgb(171, 159, 242)',
-                  '&:hover': {
-                    bgcolor: 'rgb(157, 143, 239)',
-                  },
+                  px: 4,
+                  py: 1.5,
+                  fontSize: '1rem',
+                  fontWeight: 600,
                 }}
               >
                 View {searchResults?.vehicle?.year} {searchResults?.vehicle?.make} {searchResults?.vehicle?.model} Analysis
