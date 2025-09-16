@@ -326,7 +326,11 @@ const userSlice = createSlice({
           memberSince: userData.createdAt
         };
         state.preferences = userData.preferences || state.preferences;
-        state.stats = userData.stats || state.stats;
+        state.stats = {
+          totalSearches: userData.stats?.totalSearches || 0,
+          favoriteVehicles: userData.stats?.favoriteVehicles || 0,
+          searchStreak: userData.stats?.searchStreak || 0
+        };
         state.subscription = userData.subscription || state.subscription;
         state.recentSearches = userData.recentSearches || [];
         state.favorites = userData.favorites || [];
@@ -360,7 +364,11 @@ const userSlice = createSlice({
           memberSince: userData.createdAt
         };
         state.preferences = userData.preferences || state.preferences;
-        state.stats = userData.stats || state.stats;
+        state.stats = {
+          totalSearches: userData.stats?.totalSearches || 0,
+          favoriteVehicles: userData.stats?.favoriteVehicles || 0,
+          searchStreak: userData.stats?.searchStreak || 0
+        };
         state.subscription = userData.subscription || state.subscription;
         state.recentSearches = userData.recentSearches || [];
         state.favorites = userData.favorites || [];
@@ -394,7 +402,11 @@ const userSlice = createSlice({
           memberSince: userData.createdAt
         };
         state.preferences = userData.preferences || state.preferences;
-        state.stats = userData.stats || state.stats;
+        state.stats = {
+          totalSearches: userData.stats?.totalSearches || 0,
+          favoriteVehicles: userData.stats?.favoriteVehicles || 0,
+          searchStreak: userData.stats?.searchStreak || 0
+        };
         state.subscription = userData.subscription || state.subscription;
         state.recentSearches = userData.recentSearches || [];
         state.favorites = userData.favorites || [];
@@ -428,7 +440,11 @@ const userSlice = createSlice({
           memberSince: userData.createdAt
         };
         state.preferences = userData.preferences || state.preferences;
-        state.stats = userData.stats || state.stats;
+        state.stats = {
+          totalSearches: userData.stats?.totalSearches || 0,
+          favoriteVehicles: userData.stats?.favoriteVehicles || 0,
+          searchStreak: userData.stats?.searchStreak || 0
+        };
         state.subscription = userData.subscription || state.subscription;
         state.recentSearches = userData.recentSearches || [];
         state.favorites = userData.favorites || [];

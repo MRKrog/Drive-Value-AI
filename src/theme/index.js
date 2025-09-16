@@ -39,6 +39,25 @@ export const theme = createTheme({
           border: '1px solid #2b2f31'
         },
       },
+      variants: [
+        {
+          props: { variant: 'info' },
+          style: {
+            backgroundColor: '#1A1A1A',
+            border: '1px solid #2b2f31',
+            borderRadius: 12,
+            boxShadow: 'none',
+            minHeight: 120,
+            '& .MuiCardContent-root': {
+              textAlign: 'center',
+              paddingTop: 32,
+              paddingBottom: 32,
+              paddingLeft: 24,
+              paddingRight: 24,
+            }
+          },
+        },
+      ],
     },
     MuiCardContent: {
       styleOverrides: {
@@ -76,6 +95,27 @@ export const theme = createTheme({
           },
         },
       },
+      variants: [
+        {
+          props: { variant: 'secondary' },
+          style: {
+            backgroundColor: '#1A1A1A',
+            color: '#FFFFFF',
+            border: '1px solid #C3FF51',
+            borderRadius: 8,
+            textTransform: 'none',
+            fontWeight: 500,
+            px: 4,
+            py: 1.5,
+            fontSize: '1rem',
+            '&:hover': {
+              backgroundColor: '#FFFFFF',
+              color: '#000000',
+              borderColor: '#C3FF51',
+            },
+          },
+        },
+      ],
     },
     MuiBottomNavigation: {
       styleOverrides: {

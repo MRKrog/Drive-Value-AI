@@ -22,8 +22,8 @@ export default function Login() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { loading, error } = useAppSelector(state => state.user);
-  const [email, setEmail] = useState('demo@example.com');
-  const [password, setPassword] = useState('password');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [localError, setLocalError] = useState('');
 
   const handleSubmit = async (e) => {
@@ -130,7 +130,6 @@ export default function Login() {
           </Box>
         </Box>
         
-
       </CardContent>
     </Card>
   );
