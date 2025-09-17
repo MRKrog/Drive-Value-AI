@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 // Async thunk for fetching vehicle valuation
 export const fetchVehicleValuation = createAsyncThunk(
   'vehicleValuation/fetchValuation',
-  async ({ vin, condition, mileage, isTest, isEnhanced }, { rejectWithValue }) => {
+  async ({ vin, condition, mileage, isTest }, { rejectWithValue }) => {
     try {
       const apiEndpoint = 'https://autovalidation-backend-production.up.railway.app/api/valuation'
       
@@ -25,14 +25,10 @@ export const fetchVehicleValuation = createAsyncThunk(
       }
 
       const data = await response.json()
-      
-      if (data.ai_valuation || data.analysis) {
+
+      if (data.ai_valuation) {
         return {
-          ...data,
-          analysis: data.ai_valuation || data.analysis,
-          make: data.vehicle?.make || 'Unknown',
-          model: data.vehicle?.model || 'Unknown',
-          year: data.vehicle?.year || 'Unknown',
+          ...data
         }
       } else {
         throw new Error('No analysis data received from API')
@@ -55,7 +51,6 @@ const initialState = {
     condition: 'good',
     mileage: '',
     isTestMode: false,
-    isEnhancedMode: false,
   }
 }
 

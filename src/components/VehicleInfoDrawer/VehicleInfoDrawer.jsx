@@ -26,91 +26,19 @@ import {
   Info,
   Star
 } from '@mui/icons-material'
-import { DemandSignalsCard } from './DemandSignalsCard'
 import { 
   AIValuationSummary, 
   VehicleHeader, 
   VehicleSpecs, 
-  MarketValues,
-  StrategicPricing,
-  MarketIntelligence,
-  PerformanceFactors
-} from './index'
+  MarketValues
+} from './index';
+import { parseAnalysisData } from '../../utils/vehicle-analysis-helper';
 
 export const VehicleInfoDrawer = ({ searchResults, onClose, open = false }) => {
   if (!searchResults || (!searchResults.analysis && !searchResults.ai_valuation)) return null
 
-  // Parse the new comprehensive analysis data
-  const parseAnalysisData = (data) => {
-    // Handle both new and legacy data structures
-    const aiValuation = data.ai_valuation || data.analysis || {};
-    const marketValues = aiValuation.market_values || {};
-    const baseline = data.baseline_data || {};
-    
-    return {
-      // AI-powered market values
-      retailPricing: {
-        min: marketValues.retail_value?.min || 0,
-        max: marketValues.retail_value?.max || 0,
-        suggested: marketValues.retail_value?.suggested_ai_price || 0,
-        description: marketValues.retail_value?.description || 'Dealer retail price range',
-        baselineComparison: marketValues.retail_value?.baseline_comparison || 'AI analysis provides enhanced accuracy',
-        confidence: marketValues.retail_value?.confidence_level || 'High confidence',
-        baseline: baseline.retail_value || 0
-      },
-      privateParty: {
-        min: marketValues.private_party_value?.min || 0,
-        max: marketValues.private_party_value?.max || 0,
-        suggested: marketValues.private_party_value?.suggested_ai_price || 0,
-        description: marketValues.private_party_value?.description || 'Private seller price range',
-        baselineComparison: marketValues.private_party_value?.baseline_comparison || 'AI analysis provides enhanced accuracy',
-        confidence: marketValues.private_party_value?.confidence_level || 'High confidence',
-        baseline: baseline.private_party_value || 0
-      },
-      tradeIn: {
-        min: marketValues.trade_in_value?.min || 0,
-        max: marketValues.trade_in_value?.max || 0,
-        suggested: marketValues.trade_in_value?.suggested_ai_price || 0,
-        description: marketValues.trade_in_value?.description || 'Dealer trade-in offer range',
-        baselineComparison: marketValues.trade_in_value?.baseline_comparison || 'AI analysis provides enhanced accuracy',
-        confidence: marketValues.trade_in_value?.confidence_level || 'High confidence',
-        baseline: baseline.trade_in_value || 0
-      },
-      auctionValue: {
-        min: marketValues.auction_value?.min || 0,
-        max: marketValues.auction_value?.max || 0,
-        suggested: marketValues.auction_value?.suggested_ai_price || 0,
-        description: marketValues.auction_value?.description || 'Wholesale/auction price range',
-        baselineComparison: marketValues.auction_value?.baseline_comparison || 'AI analysis provides enhanced accuracy',
-        confidence: marketValues.auction_value?.confidence_level || 'High confidence'
-      },
-      // Analysis sections - with safe fallbacks
-      analysis: aiValuation.analysis || {},
-      valueAdjustments: aiValuation.value_adjustments || {},
-      performanceAssessment: aiValuation.performance_assessment || {},
-      marketIntelligence: aiValuation.market_intelligence || {},
-      riskAnalysis: aiValuation.risk_analysis || {},
-      recommendations: aiValuation.recommendations || {},
-      confidenceMetrics: aiValuation.confidence_metrics || {},
-      // Vehicle parameters
-      mileageInfo: data.valuation_parameters?.mileage || {},
-      condition: data.valuation_parameters?.condition || 'good',
-      // Summary data
-      summary: data.summary || {}
-    };
-  };
-
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(price);
-  };
-
   const parsedAnalysis = parseAnalysisData(searchResults);
-
+  console.log('AFTER parsedAnalysis', parsedAnalysis);
   return (
     <Drawer
       anchor="bottom"
@@ -158,29 +86,187 @@ export const VehicleInfoDrawer = ({ searchResults, onClose, open = false }) => {
         </Box>
 
         <Container maxWidth="lg" sx={{ py: 3, pb: 5 }}>
+          
+          {/* Report Header with Metadata */}
+          <Card variant="info" sx={{ mb: 3 }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6" sx={{ color: '#FFFFFF', fontWeight: 600 }}>
+                  AI Vehicle Valuation Report
+                </Typography>
+                <Chip 
+                  label={parsedAnalysis.reportId || 'DVai-Report'} 
+                  sx={{ 
+                    bgcolor: 'rgba(195, 255, 81, 0.2)', 
+                    color: '#C3FF51',
+                    fontWeight: 500
+                  }} 
+                />
+              </Box>
+              <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                Generated by {parsedAnalysis.generatedBy || 'DriveValueAI API v2.0'} • {parsedAnalysis.timestamp ? new Date(parsedAnalysis.timestamp).toLocaleString() : 'Just now'}
+              </Typography>
+            </CardContent>
+          </Card>
+
           {/* Vehicle Basic Info */}
           <VehicleHeader searchResults={searchResults} parsedAnalysis={parsedAnalysis} />
 
           {/* AI Valuation Summary - Most Important Section */}
           <AIValuationSummary parsedAnalysis={parsedAnalysis} searchResults={searchResults} />
 
-          {/* Enhanced Vehicle Specifications */}
-          <VehicleSpecs searchResults={searchResults} />
+          {/* Mileage Analysis */}
+          {parsedAnalysis.mileage && (
+            <Card variant="info" sx={{ mb: 3 }}>
+              <CardContent>
+                <Typography variant="h6" sx={{ color: '#FFFFFF', mb: 2, display: 'flex', alignItems: 'center' }}>
+                  <TrendingUp sx={{ mr: 1, color: '#C3FF51' }} />
+                  Mileage Analysis
+                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={4}>
+                    <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'rgba(195, 255, 81, 0.1)', borderRadius: 2 }}>
+                      <Typography variant="h4" sx={{ color: '#C3FF51', fontWeight: 700 }}>
+                        {parsedAnalysis.mileage.actual?.toLocaleString()}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                        Actual Miles
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'rgba(160, 160, 160, 0.1)', borderRadius: 2 }}>
+                      <Typography variant="h4" sx={{ color: '#A0A0A0', fontWeight: 700 }}>
+                        {parsedAnalysis.mileage.expected?.toLocaleString()}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                        Expected Miles
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'rgba(0, 212, 170, 0.1)', borderRadius: 2 }}>
+                      <Typography variant="h4" sx={{ color: '#00D4AA', fontWeight: 700 }}>
+                        {parsedAnalysis.mileage.variancePercentage}%
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                        Below Average
+                      </Typography>
+                    </Box>
+                  </Grid>
+                </Grid>
+                <Typography variant="body2" sx={{ color: '#A0A0A0', mt: 2, fontStyle: 'italic' }}>
+                  This vehicle has {parsedAnalysis.mileage.variancePercentage}% fewer miles than expected for its age, 
+                  which significantly enhances its value and desirability in the market.
+                </Typography>
+              </CardContent>
+            </Card>
+          )}
 
-          {/* External Demand Intelligence */}
-          <DemandSignalsCard demandSignals={searchResults?.analysis?.demand_signals} />
+          {/* Key Insights */}
+          {parsedAnalysis.key_insights && (
+            <Card variant="info" sx={{ mb: 3 }}>
+              <CardContent>
+                <Typography variant="h6" sx={{ color: '#FFFFFF', mb: 2, display: 'flex', alignItems: 'center' }}>
+                  <Star sx={{ mr: 1, color: '#C3FF51' }} />
+                  Key Market Insights
+                </Typography>
+                <Grid container spacing={2}>
+                  {parsedAnalysis.key_insights.rarity_factors && (
+                    <Grid item xs={12} md={6}>
+                      <Box sx={{ p: 2, bgcolor: 'rgba(195, 255, 81, 0.05)', borderRadius: 2, border: '1px solid rgba(195, 255, 81, 0.2)' }}>
+                        <Typography variant="subtitle2" sx={{ color: '#C3FF51', fontWeight: 600, mb: 1 }}>
+                          Rarity Factors
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                          {parsedAnalysis.key_insights.rarity_factors}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  )}
+                  {parsedAnalysis.key_insights.value_enhancers && (
+                    <Grid item xs={12} md={6}>
+                      <Box sx={{ p: 2, bgcolor: 'rgba(0, 212, 170, 0.05)', borderRadius: 2, border: '1px solid rgba(0, 212, 170, 0.2)' }}>
+                        <Typography variant="subtitle2" sx={{ color: '#00D4AA', fontWeight: 600, mb: 1 }}>
+                          Value Enhancers
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                          {parsedAnalysis.key_insights.value_enhancers}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  )}
+                </Grid>
+              </CardContent>
+            </Card>
+          )}
 
           {/* AI Market Values */}
           <MarketValues parsedAnalysis={parsedAnalysis} />
 
-          {/* Strategic Pricing Recommendations */}
-          {/* <StrategicPricing parsedAnalysis={parsedAnalysis} formatPrice={formatPrice} /> */}
+          {/* Value Adjustments */}
+          {parsedAnalysis.valueAdjustments && (
+            <Card variant="info" sx={{ mb: 3 }}>
+              <CardContent>
+                <Typography variant="h6" sx={{ color: '#FFFFFF', mb: 2, display: 'flex', alignItems: 'center' }}>
+                  <Assessment sx={{ mr: 1, color: '#C3FF51' }} />
+                  Value Adjustments
+                </Typography>
+                <Grid container spacing={2}>
+                  {Object.entries(parsedAnalysis.valueAdjustments).map(([key, value]) => (
+                    key !== 'total_adjustment' && (
+                      <Grid item xs={12} md={6} key={key}>
+                        <Box sx={{ p: 2, bgcolor: 'rgba(160, 160, 160, 0.05)', borderRadius: 2 }}>
+                          <Typography variant="subtitle2" sx={{ color: '#FFFFFF', fontWeight: 600, mb: 1, textTransform: 'capitalize' }}>
+                            {key.replace(/_/g, ' ')}
+                          </Typography>
+                          <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                            {value}
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    )
+                  ))}
+                </Grid>
+                {parsedAnalysis.valueAdjustments.total_adjustment && (
+                  <Box sx={{ mt: 2, p: 2, bgcolor: 'rgba(195, 255, 81, 0.1)', borderRadius: 2, border: '1px solid rgba(195, 255, 81, 0.3)' }}>
+                    <Typography variant="subtitle2" sx={{ color: '#C3FF51', fontWeight: 600, mb: 1 }}>
+                      Total Adjustment Impact
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                      {parsedAnalysis.valueAdjustments.total_adjustment}
+                    </Typography>
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
-          {/* Performance Factors & Enhanced Recommendations */}
-          {/* <PerformanceFactors parsedAnalysis={parsedAnalysis} /> */}
-
-          {/* Market Intelligence Grid */}
-          {/* <MarketIntelligence parsedAnalysis={parsedAnalysis} searchResults={searchResults} /> */}
+          {/* Recommendations */}
+          {parsedAnalysis.recommendations && (
+            <Card variant="info" sx={{ mb: 3 }}>
+              <CardContent>
+                <Typography variant="h6" sx={{ color: '#FFFFFF', mb: 2, display: 'flex', alignItems: 'center' }}>
+                  <Info sx={{ mr: 1, color: '#C3FF51' }} />
+                  AI Recommendations
+                </Typography>
+                <Grid container spacing={2}>
+                  {Object.entries(parsedAnalysis.recommendations).map(([key, value]) => (
+                    <Grid item xs={12} md={6} key={key}>
+                      <Box sx={{ p: 2, bgcolor: 'rgba(160, 160, 160, 0.05)', borderRadius: 2 }}>
+                        <Typography variant="subtitle2" sx={{ color: '#FFFFFF', fontWeight: 600, mb: 1, textTransform: 'capitalize' }}>
+                          {key.replace(/_/g, ' ')}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                          {value}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  ))}
+                </Grid>
+              </CardContent>
+            </Card>
+          )}
 
         </Container>
       </Box>

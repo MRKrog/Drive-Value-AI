@@ -42,7 +42,8 @@ const SearchPage = () => {
     isSearching, 
     error, 
     valuationParameters 
-  } = useAppSelector(state => state.vehicleValuation)
+  } = useAppSelector(state => state.vehicleValuation);
+  // console.log('searchResults', searchResults);
   
   const { isDrawerOpen } = useAppSelector(state => state.ui)
 
@@ -73,7 +74,6 @@ const SearchPage = () => {
         condition: valuationParameters.condition,
         mileage: valuationParameters.mileage,
         isTest: valuationParameters.isTestMode,
-        isEnhanced: valuationParameters.isEnhancedMode,
       })).unwrap()
       
       // Open drawer when results are received
@@ -97,7 +97,6 @@ const SearchPage = () => {
     dispatch(setValuationParameters({
       vin: '',
       condition: 'good',
-      isEnhancedMode: false,
       mileage: ''
     }))
     dispatch(clearSearchResults())
@@ -141,7 +140,6 @@ const SearchPage = () => {
                   <Switch
                     checked={valuationParameters.isTestMode}
                     onChange={(e) => dispatch(setValuationParameters({ isTestMode: e.target.checked }))}
-                    disabled={valuationParameters.isEnhancedMode}
                     sx={{
                       '& .MuiSwitch-switchBase.Mui-checked': {
                         color: 'rgb(171, 159, 242)',
@@ -186,23 +184,6 @@ const SearchPage = () => {
           </Box>
         </Box>
         
-        {/* Mode Status */}
-        {/* <Card sx={{ mb: 3, bgcolor: 'rgba(171, 159, 242, 0.05)', border: '1px solid rgba(171, 159, 242, 0.2)' }}>
-          <CardContent sx={{ py: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <Info sx={{ color: 'rgb(171, 159, 242)', fontSize: 20 }} />
-              <Typography variant="body2" sx={{ color: '#FFFFFF', fontWeight: 500 }}>
-                Current Mode
-              </Typography>
-            </Box>
-            <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
-              {valuationParameters.isTestMode ? '🔧 Test Mode: Using predefined responses for demonstration' : 
-               valuationParameters.isEnhancedMode ? '🚀 Enhanced Mode: Using advanced API with in-depth analysis' : 
-               '🌐 Live Mode: Using real-time API with standard analysis'}
-            </Typography>
-          </CardContent>
-        </Card> */}
-        
         {/* Search Input Section */}
         <Card variant="info" sx={{ mb: 4 }}>
           <CardContent sx={{ py: 4 }}>
@@ -211,34 +192,9 @@ const SearchPage = () => {
                 Vehicle Information
               </Typography>
               
-              {/* Enhanced Mode Toggle */}
-              <Tooltip title="Enhanced Mode provides more detailed analysis with external data sources">
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={valuationParameters.isEnhancedMode}
-                      onChange={(e) => dispatch(setValuationParameters({ isEnhancedMode: e.target.checked }))}
-                      disabled={valuationParameters.isTestMode}
-                      sx={{
-                        '& .MuiSwitch-switchBase.Mui-checked': {
-                          color: '#C3FF51',
-                        },
-                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                          backgroundColor: '#C3FF51',
-                        },
-                      }}
-                    />
-                  }
-                  label={
-                    <Typography sx={{ color: '#FFFFFF', fontSize: '0.875rem', fontWeight: 500 }}>
-                      Enhanced
-                    </Typography>
-                  }
-                />
-              </Tooltip>
             </Box>
             
-            <Typography variant="body1" sx={{ mb: 4, color: '#A0A0A0', lineHeight: 1.6, maxWidth: '600px' }} textAlign="left">
+            <Typography variant="body1" sx={{ mb: 4, color: '#A0A0A0', lineHeight: 1.6, maxWidth: '600px', textAlign: 'left' }}>
               Enter the 17-character Vehicle Identification Number (VIN) and optional details for accurate AI-powered valuation
             </Typography>
             
