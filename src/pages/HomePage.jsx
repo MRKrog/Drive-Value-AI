@@ -27,7 +27,7 @@ const HomePage = () => {
 
   return (
     <Box sx={{ flex: 1 }}>
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Container maxWidth="md" sx={{ py: 4 }}>
         
         {/* Hero Section */}
         <Card variant="info" sx={{ mb: 4, textAlign: 'center' }}>
