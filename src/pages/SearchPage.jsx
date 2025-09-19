@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   Box,
   Container,
@@ -19,9 +19,13 @@ import {
   InputLabel,
   Tooltip,
   Divider,
-  Chip
+  Chip,
+  LinearProgress,
+  Snackbar,
+  Fade,
+  Collapse
 } from '@mui/material'
-import { Search, Info, Help } from '@mui/icons-material'
+import { Search, Info, Help, Keyboard, Save, Restore, CheckCircle, Error } from '@mui/icons-material'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import { 
   fetchVehicleValuation, 
@@ -47,6 +51,16 @@ const SearchPage = () => {
   
   const { isDrawerOpen } = useAppSelector(state => state.ui)
 
+  // Enhanced UX state
+  const [draftSaved, setDraftSaved] = useState(false)
+  const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false)
+  const [searchProgress, setSearchProgress] = useState(0)
+  const [searchSteps, setSearchSteps] = useState([])
+  const [snackbarOpen, setSnackbarOpen] = useState(false)
+  const [snackbarMessage, setSnackbarMessage] = useState('')
+  const [vinValidation, setVinValidation] = useState({ isValid: false, message: '' })
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+
   // Test VINs for quick selection
   const testVins = [
     { name: 'Subaru WRX STI', vin: 'JF1GR8H6XBL831881' },
@@ -54,19 +68,154 @@ const SearchPage = () => {
     // { name: 'Ford F-150', vin: '1FTFW1ET5DFC10312' }
   ]
 
+  // VIN validation function
+  const validateVIN = useCallback((vin) => {
+    if (!vin) return { isValid: false, message: '' }
+    if (vin.length < 17) return { isValid: false, message: 'VIN must be 17 characters' }
+    if (vin.length > 17) return { isValid: false, message: 'VIN must be exactly 17 characters' }
+    
+    // Basic VIN format validation (no I, O, Q)
+    const invalidChars = /[IOQ]/
+    if (invalidChars.test(vin)) {
+      return { isValid: false, message: 'VIN contains invalid characters (I, O, Q)' }
+    }
+    
+    return { isValid: true, message: 'VIN format looks good!' }
+  }, [])
+
+  // Auto-save draft functionality
+  const saveDraft = useCallback(() => {
+    const draft = {
+      vin: valuationParameters.vin,
+      mileage: valuationParameters.mileage,
+      condition: valuationParameters.condition,
+      timestamp: Date.now()
+    }
+    localStorage.setItem('searchDraft', JSON.stringify(draft))
+    setDraftSaved(true)
+    setSnackbarMessage('Draft saved automatically')
+    setSnackbarOpen(true)
+    setHasUnsavedChanges(false)
+  }, [valuationParameters])
+
+  // Load draft functionality
+  const loadDraft = useCallback(() => {
+    const savedDraft = localStorage.getItem('searchDraft')
+    if (savedDraft) {
+      try {
+        const draft = JSON.parse(savedDraft)
+        dispatch(setValuationParameters({
+          vin: draft.vin || '',
+          mileage: draft.mileage || '',
+          condition: draft.condition || 'good'
+        }))
+        setSnackbarMessage('Draft restored')
+        setSnackbarOpen(true)
+      } catch (error) {
+        console.error('Error loading draft:', error)
+      }
+    }
+  }, [dispatch])
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      // Ctrl/Cmd + Enter to search
+      if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+        event.preventDefault()
+        if (valuationParameters.vin.trim() && !isSearching) {
+          handleSearch()
+        }
+      }
+      
+      // Ctrl/Cmd + S to save draft
+      if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+        event.preventDefault()
+        saveDraft()
+      }
+      
+      // Ctrl/Cmd + R to restore draft
+      if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
+        event.preventDefault()
+        loadDraft()
+      }
+      
+      // Escape to clear
+      if (event.key === 'Escape') {
+        handleClear()
+      }
+      
+      // ? to show keyboard shortcuts
+      if (event.key === '?' && !event.ctrlKey && !event.metaKey) {
+        setShowKeyboardShortcuts(true)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [valuationParameters.vin, isSearching, saveDraft, loadDraft])
+
+  // Auto-save draft when parameters change
+  useEffect(() => {
+    if (valuationParameters.vin || valuationParameters.mileage) {
+      setHasUnsavedChanges(true)
+      const timer = setTimeout(() => {
+        saveDraft()
+      }, 2000) // Auto-save after 2 seconds of inactivity
+      
+      return () => clearTimeout(timer)
+    }
+  }, [valuationParameters.vin, valuationParameters.mileage, valuationParameters.condition, saveDraft])
+
+  // VIN validation on change
+  useEffect(() => {
+    const validation = validateVIN(valuationParameters.vin)
+    setVinValidation(validation)
+  }, [valuationParameters.vin, validateVIN])
+
+  // Search progress simulation
+  useEffect(() => {
+    if (isSearching) {
+      setSearchSteps([
+        'Validating VIN...',
+        'Fetching vehicle data...',
+        'Analyzing market conditions...',
+        'Calculating valuation...',
+        'Generating report...'
+      ])
+      
+      let progress = 0
+      const interval = setInterval(() => {
+        progress += Math.random() * 15
+        if (progress > 90) progress = 90
+        setSearchProgress(progress)
+      }, 500)
+      
+      return () => clearInterval(interval)
+    } else {
+      setSearchProgress(0)
+      setSearchSteps([])
+    }
+  }, [isSearching])
+
   const handleSearch = async () => {
     if (!valuationParameters.vin.trim()) {
       dispatch(setError('Please enter a VIN number'))
+      setSnackbarMessage('Please enter a VIN number')
+      setSnackbarOpen(true)
       return
     }
 
-    if (valuationParameters.vin.length < 17) {
-      dispatch(setError('VIN must be 17 characters long'))
+    if (!vinValidation.isValid) {
+      dispatch(setError(vinValidation.message))
+      setSnackbarMessage(vinValidation.message)
+      setSnackbarOpen(true)
       return
     }
 
     dispatch(clearError())
     dispatch(clearSearchResults())
+    setSearchProgress(0)
 
     try {
       await dispatch(fetchVehicleValuation({
@@ -76,10 +225,17 @@ const SearchPage = () => {
         isTest: valuationParameters.isTestMode,
       })).unwrap()
       
-      // Open drawer when results are received
-      dispatch(setDrawerOpen(true))
+      // Complete progress and open drawer
+      setSearchProgress(100)
+      setTimeout(() => {
+        dispatch(setDrawerOpen(true))
+        setSnackbarMessage('Search completed successfully!')
+        setSnackbarOpen(true)
+      }, 500)
     } catch (error) {
-      // Error is handled by the async thunk
+      setSearchProgress(0)
+      setSnackbarMessage('Search failed. Please try again.')
+      setSnackbarOpen(true)
     }
   }
 
@@ -102,6 +258,12 @@ const SearchPage = () => {
     dispatch(clearSearchResults())
     dispatch(setDrawerOpen(false))
     dispatch(clearError())
+    setSearchProgress(0)
+    setSearchSteps([])
+    setHasUnsavedChanges(false)
+    setVinValidation({ isValid: false, message: '' })
+    setSnackbarMessage('Form cleared')
+    setSnackbarOpen(true)
   }
 
   const handleCloseDrawer = () => {
@@ -133,6 +295,91 @@ const SearchPage = () => {
           
           {/* Controls */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {/* Draft Status */}
+            {hasUnsavedChanges && (
+              <Chip
+                icon={<Save />}
+                label="Unsaved changes"
+                size="small"
+                sx={{
+                  bgcolor: 'rgba(255, 193, 7, 0.2)',
+                  color: '#FFC107',
+                  fontSize: '0.75rem'
+                }}
+              />
+            )}
+            
+            {/* Draft Actions */}
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={saveDraft}
+              disabled={isSearching || !hasUnsavedChanges}
+              startIcon={<Save />}
+              sx={{
+                color: '#A0A0A0',
+                borderColor: '#2A2A2A',
+                fontSize: '0.75rem',
+                px: 2,
+                '&:hover': {
+                  borderColor: '#C3FF51',
+                  color: '#C3FF51',
+                },
+                '&:disabled': {
+                  borderColor: '#2A2A2A',
+                  color: '#2A2A2A',
+                },
+              }}
+            >
+              Save Draft
+            </Button>
+            
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={loadDraft}
+              disabled={isSearching}
+              startIcon={<Restore />}
+              sx={{
+                color: '#A0A0A0',
+                borderColor: '#2A2A2A',
+                fontSize: '0.75rem',
+                px: 2,
+                '&:hover': {
+                  borderColor: '#C3FF51',
+                  color: '#C3FF51',
+                },
+                '&:disabled': {
+                  borderColor: '#2A2A2A',
+                  color: '#2A2A2A',
+                },
+              }}
+            >
+              Restore
+            </Button>
+            
+            {/* Keyboard Shortcuts */}
+            <Tooltip title="Press ? for keyboard shortcuts">
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => setShowKeyboardShortcuts(!showKeyboardShortcuts)}
+                startIcon={<Keyboard />}
+                sx={{
+                  color: '#A0A0A0',
+                  borderColor: '#2A2A2A',
+                  fontSize: '0.75rem',
+                  px: 2,
+                  '&:hover': {
+                    borderColor: '#C3FF51',
+                    color: '#C3FF51',
+                  },
+                }}
+              >
+                Shortcuts
+              </Button>
+            </Tooltip>
+            
             {/* API Mode Toggle */}
             <Tooltip title="Test Mode uses predefined responses for demonstration. Live Mode uses real API data.">
               <FormControlLabel
@@ -209,26 +456,30 @@ const SearchPage = () => {
                     value={valuationParameters.vin}
                     onChange={(e) => dispatch(setValuationParameters({ vin: e.target.value.toUpperCase() }))}
                     onKeyPress={handleKeyPress}
-                    error={!!error}
-                    helperText={error || "Enter the 17-character VIN found on your vehicle"}
+                    error={!!error || (valuationParameters.vin && !vinValidation.isValid)}
+                    helperText={
+                      error || 
+                      (valuationParameters.vin && vinValidation.message) || 
+                      "Enter the 17-character VIN found on your vehicle"
+                    }
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         color: '#FFFFFF',
                         '& fieldset': {
-                          borderColor: '#2b2f31',
+                          borderColor: vinValidation.isValid && valuationParameters.vin ? '#00D4AA' : '#2b2f31',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#C3FF51',
+                          borderColor: vinValidation.isValid && valuationParameters.vin ? '#00D4AA' : '#C3FF51',
                         },
                         '&.Mui-focused fieldset': {
-                          borderColor: '#C3FF51',
+                          borderColor: vinValidation.isValid && valuationParameters.vin ? '#00D4AA' : '#C3FF51',
                         },
                       },
                       '& .MuiInputLabel-root': {
                         color: '#A0A0A0',
                       },
                       '& .MuiInputLabel-root.Mui-focused': {
-                        color: '#C3FF51',
+                        color: vinValidation.isValid && valuationParameters.vin ? '#00D4AA' : '#C3FF51',
                       },
                     }}
                   />
@@ -367,6 +618,153 @@ const SearchPage = () => {
           </CardContent>
         </Card>
 
+        {/* Search Progress */}
+        {isSearching && (
+          <Card variant="info" sx={{ mb: 4 }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <CircularProgress size={20} sx={{ mr: 2, color: '#C3FF51' }} />
+                <Typography variant="h6" sx={{ color: '#FFFFFF' }}>
+                  Analyzing Vehicle...
+                </Typography>
+              </Box>
+              
+              <LinearProgress 
+                variant="determinate" 
+                value={searchProgress} 
+                sx={{ 
+                  mb: 2,
+                  height: 8,
+                  borderRadius: 4,
+                  backgroundColor: 'rgba(195, 255, 81, 0.1)',
+                  '& .MuiLinearProgress-bar': {
+                    backgroundColor: '#C3FF51',
+                    borderRadius: 4,
+                  }
+                }}
+              />
+              
+              <Typography variant="body2" sx={{ color: '#A0A0A0', textAlign: 'center' }}>
+                {searchSteps[Math.floor((searchProgress / 100) * searchSteps.length)] || 'Processing...'}
+              </Typography>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Keyboard Shortcuts Modal */}
+        <Collapse in={showKeyboardShortcuts}>
+          <Card variant="info" sx={{ mb: 4 }}>
+            <CardContent>
+              <Typography variant="h6" sx={{ color: '#FFFFFF', mb: 3, display: 'flex', alignItems: 'center' }}>
+                <Keyboard sx={{ mr: 1, color: '#C3FF51' }} />
+                Keyboard Shortcuts
+              </Typography>
+              
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Chip 
+                      label="Ctrl + Enter" 
+                      size="small" 
+                      sx={{ 
+                        bgcolor: 'rgba(195, 255, 81, 0.2)', 
+                        color: '#C3FF51',
+                        mr: 2,
+                        fontFamily: 'monospace'
+                      }} 
+                    />
+                    <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                      Start search
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Chip 
+                      label="Ctrl + S" 
+                      size="small" 
+                      sx={{ 
+                        bgcolor: 'rgba(195, 255, 81, 0.2)', 
+                        color: '#C3FF51',
+                        mr: 2,
+                        fontFamily: 'monospace'
+                      }} 
+                    />
+                    <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                      Save draft
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Chip 
+                      label="Ctrl + R" 
+                      size="small" 
+                      sx={{ 
+                        bgcolor: 'rgba(195, 255, 81, 0.2)', 
+                        color: '#C3FF51',
+                        mr: 2,
+                        fontFamily: 'monospace'
+                      }} 
+                    />
+                    <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                      Restore draft
+                    </Typography>
+                  </Box>
+                </Grid>
+                
+                <Grid item xs={12} sm={6}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Chip 
+                      label="Escape" 
+                      size="small" 
+                      sx={{ 
+                        bgcolor: 'rgba(195, 255, 81, 0.2)', 
+                        color: '#C3FF51',
+                        mr: 2,
+                        fontFamily: 'monospace'
+                      }} 
+                    />
+                    <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                      Clear form
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Chip 
+                      label="?" 
+                      size="small" 
+                      sx={{ 
+                        bgcolor: 'rgba(195, 255, 81, 0.2)', 
+                        color: '#C3FF51',
+                        mr: 2,
+                        fontFamily: 'monospace'
+                      }} 
+                    />
+                    <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                      Show shortcuts
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Chip 
+                      label="Enter" 
+                      size="small" 
+                      sx={{ 
+                        bgcolor: 'rgba(195, 255, 81, 0.2)', 
+                        color: '#C3FF51',
+                        mr: 2,
+                        fontFamily: 'monospace'
+                      }} 
+                    />
+                    <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                      Search (in VIN field)
+                    </Typography>
+                  </Box>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Collapse>
+
         {/* View Results Button */}
         {searchResults && !isDrawerOpen && (
           <Card variant="info" sx={{ textAlign: 'center' }}>
@@ -416,6 +814,29 @@ const SearchPage = () => {
             {error}
           </Alert>
         )}
+
+        {/* Snackbar Notifications */}
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={3000}
+          onClose={() => setSnackbarOpen(false)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert 
+            onClose={() => setSnackbarOpen(false)} 
+            severity="info"
+            sx={{ 
+              bgcolor: 'rgba(195, 255, 81, 0.1)',
+              border: '1px solid rgba(195, 255, 81, 0.3)',
+              color: '#C3FF51',
+              '& .MuiAlert-icon': {
+                color: '#C3FF51'
+              }
+            }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
       </Container>
     </Box>
   )
