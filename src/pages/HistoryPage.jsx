@@ -260,26 +260,327 @@ const HistoryPage = () => {
             ))}
           </Stack>
         ) : (
-          /* Empty State */
-          <Card variant="info">
-            <CardContent sx={{ textAlign: 'center', py: 6 }}>
-              <Search sx={{ fontSize: 64, color: '#A0A0A0', mb: 2 }} />
-              <Typography variant="h6" sx={{ color: '#FFFFFF', mb: 1 }}>
-                No Search History Yet
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#A0A0A0', mb: 3 }}>
-                Start searching for vehicles to see your history here
-              </Typography>
-              <Button
-                variant="secondary"
-                size="large"
-                startIcon={<Search />}
-                onClick={() => navigate(PATH_DASHBOARD.search)}
-              >
-                Start Your First Search
-              </Button>
-            </CardContent>
-          </Card>
+          /* Enhanced Empty State */
+          <Box>
+            {/* Main Empty State */}
+            <Card variant="info" sx={{ mb: 3 }}>
+              <CardContent sx={{ textAlign: 'center', py: 6 }}>
+                <Search sx={{ fontSize: 64, color: '#A0A0A0', mb: 2 }} />
+                <Typography variant="h5" sx={{ color: '#FFFFFF', mb: 1, fontWeight: 600 }}>
+                  No Search History Yet
+                </Typography>
+                <Typography variant="body1" sx={{ color: '#A0A0A0', mb: 3, maxWidth: '400px', mx: 'auto' }}>
+                  Start searching for vehicles to build your valuation history and track your automotive insights
+                </Typography>
+                <Button
+                  variant="secondary"
+                  size="large"
+                  startIcon={<Search />}
+                  onClick={() => navigate(PATH_DASHBOARD.search)}
+                  sx={{ mb: 4 }}
+                >
+                  Start Your First Search
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Sample Data Preview */}
+            <Card variant="info" sx={{ mb: 3 }}>
+              <CardContent>
+                <Typography variant="h6" sx={{ color: '#FFFFFF', mb: 3, display: 'flex', alignItems: 'center' }}>
+                  <DirectionsCar sx={{ mr: 1, color: '#C3FF51' }} />
+                  What You'll See Here
+                </Typography>
+                
+                <Typography variant="body2" sx={{ color: '#A0A0A0', mb: 3 }}>
+                  Once you start searching, your history will look like this:
+                </Typography>
+
+                {/* Sample Search Cards */}
+                <Stack spacing={2}>
+                  {/* Sample 1 */}
+                  <Card sx={{ 
+                    bgcolor: 'rgba(195, 255, 81, 0.05)', 
+                    border: '1px solid rgba(195, 255, 81, 0.2)',
+                    opacity: 0.7
+                  }}>
+                    <CardContent>
+                      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                        <Box sx={{ flex: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <Avatar sx={{ 
+                              bgcolor: 'rgba(195, 255, 81, 0.1)', 
+                              color: '#C3FF51', 
+                              mr: 2,
+                              width: 48,
+                              height: 48
+                            }}>
+                              <DirectionsCar />
+                            </Avatar>
+                            <Box>
+                              <Typography variant="h6" sx={{ color: '#FFFFFF', mb: 0.5 }}>
+                                2020 Tesla Model 3
+                              </Typography>
+                              <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                                VIN: 5YJ3E1EA4LF123456
+                              </Typography>
+                            </Box>
+                          </Box>
+                          
+                          <Grid container spacing={2}>
+                            <Grid item xs={6} sm={3}>
+                              <Typography variant="caption" sx={{ color: '#A0A0A0', display: 'block' }}>
+                                Search Date
+                              </Typography>
+                              <Typography variant="body2" sx={{ color: '#FFFFFF' }}>
+                                Dec 15, 2024
+                              </Typography>
+                            </Grid>
+                            
+                            <Grid item xs={6} sm={3}>
+                              <Typography variant="caption" sx={{ color: '#A0A0A0', display: 'block' }}>
+                                Valuation
+                              </Typography>
+                              <Typography variant="body2" sx={{ color: '#C3FF51', fontWeight: 600 }}>
+                                $32,500
+                              </Typography>
+                            </Grid>
+                            
+                            <Grid item xs={6} sm={3}>
+                              <Typography variant="caption" sx={{ color: '#A0A0A0', display: 'block' }}>
+                                Mileage
+                              </Typography>
+                              <Typography variant="body2" sx={{ color: '#FFFFFF' }}>
+                                45,000 mi
+                              </Typography>
+                            </Grid>
+                            
+                            <Grid item xs={6} sm={3}>
+                              <Typography variant="caption" sx={{ color: '#A0A0A0', display: 'block' }}>
+                                Status
+                              </Typography>
+                              <Chip 
+                                label="Completed" 
+                                size="small"
+                                sx={{ 
+                                  bgcolor: 'rgba(0, 212, 170, 0.2)', 
+                                  color: '#00D4AA',
+                                  fontWeight: 500
+                                }}
+                              />
+                            </Grid>
+                          </Grid>
+                        </Box>
+                        
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, ml: 2 }}>
+                          <Button
+                            variant="secondary"
+                            size="small"
+                            startIcon={<Refresh />}
+                            disabled
+                            sx={{ minWidth: 'auto', px: 2, opacity: 0.5 }}
+                          >
+                            Re-search
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            startIcon={<Visibility />}
+                            disabled
+                            sx={{ minWidth: 'auto', px: 2, opacity: 0.5 }}
+                          >
+                            Details
+                          </Button>
+                        </Box>
+                      </Box>
+                    </CardContent>
+                  </Card>
+
+                  {/* Sample 2 */}
+                  <Card sx={{ 
+                    bgcolor: 'rgba(195, 255, 81, 0.05)', 
+                    border: '1px solid rgba(195, 255, 81, 0.2)',
+                    opacity: 0.5
+                  }}>
+                    <CardContent>
+                      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                        <Box sx={{ flex: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <Avatar sx={{ 
+                              bgcolor: 'rgba(195, 255, 81, 0.1)', 
+                              color: '#C3FF51', 
+                              mr: 2,
+                              width: 48,
+                              height: 48
+                            }}>
+                              <DirectionsCar />
+                            </Avatar>
+                            <Box>
+                              <Typography variant="h6" sx={{ color: '#FFFFFF', mb: 0.5 }}>
+                                2018 BMW 3 Series
+                              </Typography>
+                              <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                                VIN: WBA3A5C58JE123456
+                              </Typography>
+                            </Box>
+                          </Box>
+                          
+                          <Grid container spacing={2}>
+                            <Grid item xs={6} sm={3}>
+                              <Typography variant="caption" sx={{ color: '#A0A0A0', display: 'block' }}>
+                                Search Date
+                              </Typography>
+                              <Typography variant="body2" sx={{ color: '#FFFFFF' }}>
+                                Dec 10, 2024
+                              </Typography>
+                            </Grid>
+                            
+                            <Grid item xs={6} sm={3}>
+                              <Typography variant="caption" sx={{ color: '#A0A0A0', display: 'block' }}>
+                                Valuation
+                              </Typography>
+                              <Typography variant="body2" sx={{ color: '#C3FF51', fontWeight: 600 }}>
+                                $28,750
+                              </Typography>
+                            </Grid>
+                            
+                            <Grid item xs={6} sm={3}>
+                              <Typography variant="caption" sx={{ color: '#A0A0A0', display: 'block' }}>
+                                Mileage
+                              </Typography>
+                              <Typography variant="body2" sx={{ color: '#FFFFFF' }}>
+                                62,000 mi
+                              </Typography>
+                            </Grid>
+                            
+                            <Grid item xs={6} sm={3}>
+                              <Typography variant="caption" sx={{ color: '#A0A0A0', display: 'block' }}>
+                                Status
+                              </Typography>
+                              <Chip 
+                                label="Completed" 
+                                size="small"
+                                sx={{ 
+                                  bgcolor: 'rgba(0, 212, 170, 0.2)', 
+                                  color: '#00D4AA',
+                                  fontWeight: 500
+                                }}
+                              />
+                            </Grid>
+                          </Grid>
+                        </Box>
+                        
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, ml: 2 }}>
+                          <Button
+                            variant="secondary"
+                            size="small"
+                            startIcon={<Refresh />}
+                            disabled
+                            sx={{ minWidth: 'auto', px: 2, opacity: 0.5 }}
+                          >
+                            Re-search
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            startIcon={<Visibility />}
+                            disabled
+                            sx={{ minWidth: 'auto', px: 2, opacity: 0.5 }}
+                          >
+                            Details
+                          </Button>
+                        </Box>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Stack>
+              </CardContent>
+            </Card>
+
+            {/* Quick Start Guide */}
+            <Card variant="info">
+              <CardContent>
+                <Typography variant="h6" sx={{ color: '#FFFFFF', mb: 3, display: 'flex', alignItems: 'center' }}>
+                  <Star sx={{ mr: 1, color: '#C3FF51' }} />
+                  Getting Started
+                </Typography>
+                
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={4}>
+                    <Box sx={{ textAlign: 'center' }}>
+                      <Box sx={{ 
+                        width: 60, 
+                        height: 60, 
+                        borderRadius: '50%', 
+                        bgcolor: 'rgba(195, 255, 81, 0.1)', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        mx: 'auto', 
+                        mb: 2 
+                      }}>
+                        <Typography variant="h4" sx={{ color: '#C3FF51', fontWeight: 700 }}>1</Typography>
+                      </Box>
+                      <Typography variant="h6" sx={{ color: '#FFFFFF', mb: 1 }}>
+                        Enter VIN
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                        Start with a 17-character Vehicle Identification Number for instant vehicle details
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  
+                  <Grid item xs={12} md={4}>
+                    <Box sx={{ textAlign: 'center' }}>
+                      <Box sx={{ 
+                        width: 60, 
+                        height: 60, 
+                        borderRadius: '50%', 
+                        bgcolor: 'rgba(195, 255, 81, 0.1)', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        mx: 'auto', 
+                        mb: 2 
+                      }}>
+                        <Typography variant="h4" sx={{ color: '#C3FF51', fontWeight: 700 }}>2</Typography>
+                      </Box>
+                      <Typography variant="h6" sx={{ color: '#FFFFFF', mb: 1 }}>
+                        Get AI Valuation
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                        Our AI analyzes thousands of data points to provide accurate market valuations
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  
+                  <Grid item xs={12} md={4}>
+                    <Box sx={{ textAlign: 'center' }}>
+                      <Box sx={{ 
+                        width: 60, 
+                        height: 60, 
+                        borderRadius: '50%', 
+                        bgcolor: 'rgba(195, 255, 81, 0.1)', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        mx: 'auto', 
+                        mb: 2 
+                      }}>
+                        <Typography variant="h4" sx={{ color: '#C3FF51', fontWeight: 700 }}>3</Typography>
+                      </Box>
+                      <Typography variant="h6" sx={{ color: '#FFFFFF', mb: 1 }}>
+                        Track History
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#A0A0A0' }}>
+                        View all your searches, compare valuations, and build your automotive knowledge
+                      </Typography>
+                    </Box>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Box>
         )}
       </Container>
     </Box>
