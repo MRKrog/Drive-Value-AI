@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo, useCallback } from 'react'
 import {
   Box,
   Container,
@@ -18,12 +18,12 @@ import {
 } from '@mui/icons-material'
 import { PATH_DASHBOARD } from '../routes/paths'
 
-const HomePage = () => {
+const HomePage = memo(() => {
   const navigate = useNavigate()
   
-  const handleSearchClick = () => {
+  const handleSearchClick = useCallback(() => {
     navigate(PATH_DASHBOARD.search)
-  }
+  }, [navigate])
 
   return (
     <Box sx={{ flex: 1 }}>
@@ -46,7 +46,7 @@ const HomePage = () => {
               mb: 4, 
               lineHeight: 1.6,
               maxWidth: '600px',
-              mx: 'auto'
+              mx: 'auto',
             }}>
               Get instant, accurate vehicle valuations powered by advanced AI. 
               Trusted by dealers, auction houses, and individual buyers nationwide.
@@ -86,8 +86,8 @@ const HomePage = () => {
                   fontSize: '0.875rem',
                   lineHeight: 1.4
                 }}>
-                  Get instant vehicle valuations in seconds,<br />
-                  not hours. Our AI processes thousands of<br />
+                  Get instant vehicle valuations in seconds. 
+                  Our AI processes thousands of
                   data points to deliver accurate results.
                 </Typography>
               </CardContent>
@@ -114,8 +114,8 @@ const HomePage = () => {
                   fontSize: '0.875rem',
                   lineHeight: 1.4
                 }}>
-                  Advanced machine learning algorithms<br />
-                  analyze market trends, condition, and<br />
+                  Advanced machine learning algorithms
+                  analyze market trends, condition, and
                   history for precise valuations.
                 </Typography>
               </CardContent>
@@ -142,8 +142,8 @@ const HomePage = () => {
                   fontSize: '0.875rem',
                   lineHeight: 1.4
                 }}>
-                  Reliable market data from trusted<br />
-                  sources including dealerships, auctions,<br />
+                  Reliable market data from trusted
+                  sources including dealerships, auctions,
                   and industry databases.
                 </Typography>
               </CardContent>
@@ -154,6 +154,8 @@ const HomePage = () => {
       </Container>
     </Box>
   )
-}
+})
+
+HomePage.displayName = 'HomePage'
 
 export default HomePage 

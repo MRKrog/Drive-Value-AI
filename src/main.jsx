@@ -9,7 +9,14 @@ import { theme } from './theme'
 import { store } from './store'
 import AuthInitializer from './components/AuthInitializer'
 import Router from './routes/Router'
+import { logBundleSize, logMemoryUsage } from './utils/performance'
 import './global.css'
+
+// Performance monitoring in development
+if (import.meta.env.DEV) {
+  logBundleSize()
+  logMemoryUsage()
+}
 
 function DriveValueApp() {
   // You'll need to set this in your environment variables

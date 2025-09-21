@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo, useCallback, useMemo } from 'react'
 import {
   Box,
   Container,
@@ -28,7 +28,7 @@ import { useAppSelector } from '../store/hooks'
 import { useNavigate } from 'react-router-dom'
 import { PATH_DASHBOARD } from '../routes/paths'
 
-const HistoryPage = () => {
+const HistoryPage = memo(() => {
   const navigate = useNavigate()
   const { recentSearches, stats } = useAppSelector(state => state.user)
   
@@ -585,6 +585,8 @@ const HistoryPage = () => {
       </Container>
     </Box>
   )
-}
+})
+
+HistoryPage.displayName = 'HistoryPage'
 
 export default HistoryPage 

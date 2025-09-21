@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, memo } from 'react'
 import {
   Box,
   Container,
@@ -37,19 +37,8 @@ import {
 import { setDrawerOpen } from '../store/slices/uiSlice'
 import { VehicleInfoDrawer } from '../components/VehicleInfoDrawer/index'
 
-const SearchPage = () => {
+const SearchPage = memo(() => {
   const dispatch = useAppDispatch()
-  
-  // Get state from Redux
-  const { 
-    searchResults, 
-    isSearching, 
-    error, 
-    valuationParameters 
-  } = useAppSelector(state => state.vehicleValuation);
-  // console.log('searchResults', searchResults);
-  
-  const { isDrawerOpen } = useAppSelector(state => state.ui)
 
   // Enhanced UX state
   const [draftSaved, setDraftSaved] = useState(false)
@@ -61,12 +50,19 @@ const SearchPage = () => {
   const [vinValidation, setVinValidation] = useState({ isValid: false, message: '' })
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
-  // Test VINs for quick selection
-  const testVins = [
+  // Memoized test VINs to prevent unnecessary re-renders
+  const testVins = useMemo(() => [
     { name: 'Subaru WRX STI', vin: 'JF1GR8H6XBL831881' },
     // { name: 'Honda Civic', vin: '1HGBH41JXMN109186' },
     // { name: 'Ford F-150', vin: '1FTFW1ET5DFC10312' }
-  ]
+  ], [])
+
+  // Memoized selectors to prevent unnecessary re-renders
+  const vehicleValuationState = useAppSelector(state => state.vehicleValuation)
+  const uiState = useAppSelector(state => state.ui)
+  
+  const { searchResults, isSearching, error, valuationParameters } = vehicleValuationState
+  const { isDrawerOpen } = uiState
 
   // VIN validation function
   const validateVIN = useCallback((vin) => {
@@ -245,11 +241,12 @@ const SearchPage = () => {
     }
   }
 
-  const handleTestVinSelect = (selectedVin) => {
+  // Memoized handlers to prevent unnecessary re-renders
+  const handleTestVinSelect = useCallback((selectedVin) => {
     dispatch(setValuationParameters({ vin: selectedVin }))
-  }
+  }, [dispatch])
 
-  const handleClear = () => {
+  const handleClear = useCallback(() => {
     dispatch(setValuationParameters({
       vin: '',
       condition: 'good',
@@ -264,11 +261,19 @@ const SearchPage = () => {
     setVinValidation({ isValid: false, message: '' })
     setSnackbarMessage('Form cleared')
     setSnackbarOpen(true)
-  }
+  }, [dispatch])
 
-  const handleCloseDrawer = () => {
+  const handleCloseDrawer = useCallback(() => {
     dispatch(setDrawerOpen(false))
-  }
+  }, [dispatch])
+
+  const handleSnackbarClose = useCallback(() => {
+    setSnackbarOpen(false)
+  }, [])
+
+  const handleKeyboardShortcutsToggle = useCallback(() => {
+    setShowKeyboardShortcuts(prev => !prev)
+  }, [])
 
   return (
     <Box sx={{
@@ -360,11 +365,11 @@ const SearchPage = () => {
             
             {/* Keyboard Shortcuts */}
             <Tooltip title="Press ? for keyboard shortcuts">
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => setShowKeyboardShortcuts(!showKeyboardShortcuts)}
-                startIcon={<Keyboard />}
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handleKeyboardShortcutsToggle}
+              startIcon={<Keyboard />}
                 sx={{
                   color: '#A0A0A0',
                   borderColor: '#2A2A2A',
@@ -819,11 +824,11 @@ const SearchPage = () => {
         <Snackbar
           open={snackbarOpen}
           autoHideDuration={3000}
-          onClose={() => setSnackbarOpen(false)}
+          onClose={handleSnackbarClose}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         >
           <Alert 
-            onClose={() => setSnackbarOpen(false)} 
+            onClose={handleSnackbarClose} 
             severity="info"
             sx={{ 
               bgcolor: 'rgba(195, 255, 81, 0.1)',
@@ -840,6 +845,8 @@ const SearchPage = () => {
       </Container>
     </Box>
   )
-}
+})
+
+SearchPage.displayName = 'SearchPage'
 
 export default SearchPage 

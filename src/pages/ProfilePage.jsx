@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo, useCallback, useMemo } from 'react'
 import {
   Box,
   Container,
@@ -23,7 +23,7 @@ import {
 import { useAppSelector } from '../store/hooks'
 import ProfileAvatar from '../components/ProfileAvatar'
 
-const ProfilePage = () => {
+const ProfilePage = memo(() => {
   const user = useAppSelector(state => state.user)
   console.log('user', user)
   
@@ -276,6 +276,8 @@ const ProfilePage = () => {
       </Container>
     </Box>
   )
-}
+})
+
+ProfilePage.displayName = 'ProfilePage'
 
 export default ProfilePage 
