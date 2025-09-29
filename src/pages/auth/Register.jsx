@@ -42,7 +42,7 @@ export default function Register() {
       display: 'flex', 
       alignItems: 'center', 
       justifyContent: 'center',
-      background: 'linear-gradient(135deg, #151718 0%, #1a1d1e 100%)',
+      // background: 'linear-gradient(135deg, #151718 0%, #1a1d1e 100%)',
       py: 4
     }}>
       <Card variant="info" sx={{ 
